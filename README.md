@@ -1,4 +1,7 @@
 # CakePHP Sentry Plugin
+
+[![Latest Stable Version](http://poser.pugx.org/lordsimal/cakephp-sentry/v)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![Total Downloads](http://poser.pugx.org/lordsimal/cakephp-sentry/downloads)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![Latest Unstable Version](http://poser.pugx.org/lordsimal/cakephp-sentry/v/unstable)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![License](http://poser.pugx.org/lordsimal/cakephp-sentry/license)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![PHP Version Require](http://poser.pugx.org/lordsimal/cakephp-sentry/require/php)](https://packagist.org/packages/lordsimal/cakephp-sentry)
+
 CakePHP integration for Sentry.
 
 ℹ️ This is a refactored version of https://github.com/Connehito/cake-sentry to remove deprecation warnings introduced in CakePHP 4.4 ℹ️
