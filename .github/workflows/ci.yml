@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+  testsuite-linux:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.0', '8.1']
+        dependencies: ['highest']
+        include:
+          - php-version: '7.4'
+            dependencies: 'lowest'
+          - php-version: '8.1'
+            dependencies: 'highest'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+          ini-values: zend.assertions=1
+          coverage: pcov
+
+      - name: Composer install
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+          composer-options: ${{ matrix.composer-options }}
+
+      - name: Run PHPUnit
+        run: |
+          if [[ ${{ matrix.php-version }} == '8.1' && ${{ matrix.dependencies }} == 'highest' ]]; then
+            export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
+          else
+            vendor/bin/phpunit
+          fi
+      - name: Code Coverage Report
+        if: success() && matrix.php-version == '8.1' && matrix.dependencies == 'highest'
+        uses: codecov/codecov-action@v3

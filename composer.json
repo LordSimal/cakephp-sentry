@@ -1,0 +1,47 @@
+{
+    "name": "lordsimal/cakephp-sentry",
+    "description": "Sentry plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "cakephp/cakephp": "^4.4",
+        "sentry/sdk": "^3.2"
+    },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "@stable",
+        "jangregor/phpstan-prophecy": "@stable",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpstan/phpstan": "@stable",
+        "phpunit/phpunit": "^9.3",
+        "symfony/http-client": "^5.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "CakeSentry\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CakeSentry\\Test\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs-check": "phpcs --colors -p ./src ./tests/TestCase",
+        "cs-fix": "phpcbf --colors -p ./src ./tests/TestCase"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "authors": [
+        {
+            "name": "Kevin Pfeifer",
+            "email": "info@pfeiferkevin.at",
+            "role": "Maintainer"
+        }
+    ]
+}

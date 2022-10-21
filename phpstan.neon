@@ -1,0 +1,9 @@
+includes:
+- vendor/jangregor/phpstan-prophecy/extension.neon
+parameters:
+    paths:
+      - src
+      - tests/TestCase
+    level: 5
+    bootstrapFiles:
+      - tests/bootstrap.php
