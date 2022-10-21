@@ -19,9 +19,10 @@ composer require lordsimal/cakephp-sentry
 ```php
 // in `config/app.php`
 return [
-  'Sentry' => [
-    'dsn' => '<sentry-dsn-url>'
-  ]
+    'Sentry' => [
+        'dsn' => '<sentry-dsn-url>',
+        'environment' => 'production',
+    ]
 ];
 ```
 
@@ -92,7 +93,7 @@ class SentryOptionsContext implements EventListenerInterface
 
     public function setServerContext(Event $event): void
     {
-        /** @var Client $subject */
+        /** @var \CakeSentry\Http\SentryClient $subject */
         $subject = $event->getSubject();
         $options = $subject->getHub()->getClient()->getOptions();
 
@@ -112,8 +113,6 @@ And in `config/bootstrap.php`
 ```php
 use Cake\Event\Event;
 use Cake\Event\EventListenerInterface;
-use Cake\Http\ServerRequest;
-use Cake\Http\ServerRequestFactory;
 use Sentry\State\Scope;
 
 use function Sentry\configureScope as sentryConfigureScope;
@@ -130,11 +129,8 @@ class SentryErrorContext implements EventListenerInterface
     public function setContext(Event $event): void
     {
         if (PHP_SAPI !== 'cli') {
-            /** @var ServerRequest $request */
-            $request = $event->getData('request') ?? ServerRequestFactory::fromGlobals();
-            $request->trustProxy = true;
-
-            sentryConfigureScope(function (Scope $scope) use ($request, $event) {
+            sentryConfigureScope(function (Scope $scope) use ($event) {
+                $request = \Cake\Routing\Router::getRequest();
                 $scope->setTag('app_version',  $request->getHeaderLine('App-Version') ?: 1.0);
                 $exception = $event->getData('exception');
                 if ($exception) {
@@ -160,6 +156,8 @@ And in `config/bootstrap.php`
 ### Example for `CakeSentry.Client.afterCapture`
 
 ```php
+use Cake\Event\Event;
+
 class SentryErrorContext implements EventListenerInterface
 {
     public function implementedEvents(): array
