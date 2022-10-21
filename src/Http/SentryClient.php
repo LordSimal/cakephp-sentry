@@ -5,12 +5,16 @@ namespace CakeSentry\Http;
 
 use Cake\Core\Configure;
 use Cake\Core\InstanceConfigTrait;
+use Cake\Datasource\ConnectionInterface;
+use Cake\Datasource\ConnectionManager;
 use Cake\Error\PhpError;
 use Cake\Event\Event;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Utility\Hash;
+use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
+use Sentry\Breadcrumb;
 use Sentry\SentrySdk;
 use Sentry\Severity;
 use Sentry\State\HubInterface;
@@ -39,6 +43,13 @@ class SentryClient
     protected HubInterface $hub;
 
     /**
+     * Loggers connected
+     *
+     * @var array
+     */
+    protected array $_loggers = [];
+
+    /**
      * Client constructor.
      *
      * @param array $config config for uses Sentry
@@ -54,7 +65,7 @@ class SentryClient
     }
 
     /**
-     * Construct Raven_Client and inject config.
+     * Init sentry client
      *
      * @return void
      */
@@ -70,6 +81,62 @@ class SentryClient
 
         $event = new Event('CakeSentry.Client.afterSetup', $this);
         $this->getEventManager()->dispatch($event);
+    }
+
+    /**
+     * @return void
+     */
+    protected function getQueryLoggers(): void
+    {
+        $configs = ConnectionManager::configured();
+        $includeSchemaReflection = (bool)Configure::read('CakeSentry.includeSchemaReflection');
+
+        foreach ($configs as $name) {
+            $connection = ConnectionManager::get($name);
+            if (
+                $connection->configName() === 'debug_kit'
+                || !$connection instanceof ConnectionInterface
+            ) {
+                continue;
+            }
+            $logger = $connection->getLogger();
+
+            if ($logger instanceof CakeSentryLog) {
+                $logger->setIncludeSchema($includeSchemaReflection);
+                $this->_loggers[] = $logger;
+            }
+        }
+    }
+
+    /**
+     * Add an extra breadcrumb to the event foreach query executed in each logger
+     *
+     * @return void
+     */
+    protected function addQueryBreadcrumbs(): void
+    {
+        if ($this->_loggers) {
+            foreach ($this->_loggers as $logger) {
+                $queries = $logger->queries();
+                if (empty($queries)) {
+                    continue;
+                }
+
+                foreach ($queries as $query) {
+                    $data = ['connectionName' => $logger->name()];
+                    $data['executionTimeMs'] = $query['took'];
+                    $data['rows'] = $query['rows'];
+
+                    $this->getHub()->addBreadcrumb(new Breadcrumb(
+                        Breadcrumb::LEVEL_INFO,
+                        Breadcrumb::TYPE_DEFAULT,
+                        'sql.query',
+                        $query['query'],
+                        $data
+                    ));
+                }
+            }
+        }
     }
 
     /**
@@ -94,6 +161,9 @@ class SentryClient
                 $scope->setExtras($extras);
             });
         }
+
+        $this->getQueryLoggers();
+        $this->addQueryBreadcrumbs();
 
         $lastEventId = captureException($exception);
         $event = new Event('CakeSentry.Client.afterCapture', $this, compact('exception', 'request', 'lastEventId'));
@@ -122,6 +192,9 @@ class SentryClient
                 $scope->setExtras($extras);
             });
         }
+
+        $this->getQueryLoggers();
+        $this->addQueryBreadcrumbs();
 
         $lastEventId = captureMessage(
             $error->getMessage(),

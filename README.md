@@ -9,14 +9,13 @@ CakePHP integration for Sentry.
 - and a [Sentry](https://sentry.io) account
 
 ## Installation
-### With composer install.
 ```
 composer require lordsimal/cakephp-sentry
 ```
 
 ## Usage
 
-### Set config files.
+### Set config files
 ```php
 // in `config/app.php`
 return [
@@ -26,7 +25,7 @@ return [
 ];
 ```
 
-### Loading plugin.
+### Loading plugin
 In Application.php
 ```php
 public function bootstrap()
@@ -39,7 +38,7 @@ public function bootstrap()
 
 Or use the cake CLI.
 ```
-bin/cake plugin load LordSimal/CakeSentry
+bin/cake plugin load CakeSentry
 ```
 
 That's all! 🎉
@@ -175,6 +174,24 @@ class SentryErrorContext implements EventListenerInterface
         $lastEventId = $event->getData('lastEventId');
     }
 }
+```
+
+### Query logging (optional)
+
+If you want sentry events to also have query logging enabled you can do this via your config:
+
+```php
+'CakeSentry' => [
+    'enableQueryLogging' => true
+]
+```
+
+If you want queries related to schema reflection also inside your events then you can enable that via
+
+```php
+'CakeSentry' => [
+    'includeSchemaReflection' => true
+]
 ```
 
 ## License
