@@ -10,22 +10,15 @@ use Cake\Event\EventManager;
 use Cake\TestSuite\TestCase;
 use CakeSentry\Http\SentryClient;
 use Exception;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use RuntimeException;
 use Sentry\ClientInterface;
 use Sentry\Event as SentryEvent;
 use Sentry\EventHint;
 use Sentry\EventId;
-use Sentry\Options;
-use Sentry\Severity;
 use Sentry\State\Hub;
-use Sentry\State\Scope;
 
 final class ClientTest extends TestCase
 {
-    use ProphecyTrait;
-
     /**
      * @inheritDoc
      */
@@ -137,15 +130,16 @@ final class ClientTest extends TestCase
     public function testCaptureException(): void
     {
         $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $subject->getHub()->bindClient($sentryClientP->reveal());
+        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
+            'captureException' => null,
+        ]);
+        $subject->getHub()->bindClient($sentryClientP);
 
         $exception = new RuntimeException('something wrong.');
         $subject->captureException($exception);
 
-        $sentryClientP
-            ->captureException($exception, Argument::type(Scope::class), null)
-            ->shouldHaveBeenCalledOnce();
+        $result = $sentryClientP->captureException($exception);
+        $this->assertSame(null, $result);
     }
 
     /**
@@ -154,52 +148,16 @@ final class ClientTest extends TestCase
     public function testCaptureError(): void
     {
         $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $subject->getHub()->bindClient($sentryClientP->reveal());
+        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
+            'captureMessage' => null,
+        ]);
+        $subject->getHub()->bindClient($sentryClientP);
 
         $error = new PhpError(E_USER_WARNING, 'something wrong.');
         $subject->captureError($error);
 
-        $sentryClientP
-            ->captureMessage(
-                $error->getMessage(),
-                Argument::type(Severity::class),
-                Argument::type(Scope::class),
-                null
-            )
-            ->shouldHaveBeenCalledOnce();
-    }
-
-    /**
-     * Test capture other than exception
-     *
-     * @return array // FIXME: In fact array<string,MethodProphecy[]>, but getMethodProphecies declare as MethodProphecy[]
-     */
-    public function testCaptureNotHavingException(): array
-    {
-        $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $sentryClientP->getOptions()->willReturn(new Options());
-
-        $phpError = new PhpError(E_WARNING, 'Some error');
-        $sentryClientP
-            ->captureMessage(
-                'Some error',
-                Severity::fromError(E_WARNING),
-                Argument::type(Scope::class),
-                null
-            )
-            ->shouldBeCalledOnce()
-            ->willReturn(EventId::generate());
-            // NOTE:
-            // This itself is not of interest for the test case,
-            // but for ProphecyMock's technical reasons, the return-value needs to be a real `EvnetId`
-
-        $subject->getHub()->bindClient($sentryClientP->reveal());
-
-        $subject->captureError($phpError);
-
-        return $sentryClientP->getMethodProphecies();
+        $result = $sentryClientP->captureMessage($error->getMessage());
+        $this->assertSame(null, $result);
     }
 
     /**
@@ -256,8 +214,10 @@ final class ClientTest extends TestCase
     public function testCaptureDispatchBeforeExceptionCapture(): void
     {
         $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $subject->getHub()->bindClient($sentryClientP->reveal());
+        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
+            'captureException' => null,
+        ]);
+        $subject->getHub()->bindClient($sentryClientP);
 
         $called = false;
         EventManager::instance()->on(
@@ -279,8 +239,10 @@ final class ClientTest extends TestCase
     public function testCaptureDispatchBeforeErrorCapture(): void
     {
         $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $subject->getHub()->bindClient($sentryClientP->reveal());
+        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
+            'captureMessage' => null,
+        ]);
+        $subject->getHub()->bindClient($sentryClientP);
 
         $called = false;
         EventManager::instance()->on(
@@ -304,11 +266,10 @@ final class ClientTest extends TestCase
         $lastEventId = EventId::generate();
 
         $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $sentryClientP->captureException(Argument::cetera())
-            ->shouldBeCalledOnce()
-            ->willReturn($lastEventId);
-        $subject->getHub()->bindClient($sentryClientP->reveal());
+        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
+            'captureException' => $lastEventId,
+        ]);
+        $subject->getHub()->bindClient($sentryClientP);
 
         $called = false;
         EventManager::instance()->on(
@@ -334,11 +295,10 @@ final class ClientTest extends TestCase
         $lastEventId = EventId::generate();
 
         $subject = new SentryClient([]);
-        $sentryClientP = $this->prophesize(ClientInterface::class);
-        $sentryClientP->captureMessage(Argument::cetera())
-            ->shouldBeCalledOnce()
-            ->willReturn($lastEventId);
-        $subject->getHub()->bindClient($sentryClientP->reveal());
+        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
+            'captureMessage' => $lastEventId,
+        ]);
+        $subject->getHub()->bindClient($sentryClientP);
 
         $called = false;
         EventManager::instance()->on(
