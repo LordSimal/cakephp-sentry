@@ -9,7 +9,6 @@
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "@stable",
-        "phpstan/phpstan": "@stable",
         "phpunit/phpunit": "^9.3",
         "symfony/http-client": "^5.2"
     },
