@@ -1,6 +1,7 @@
 # CakePHP Sentry Plugin
 
 [![Latest Stable Version](http://poser.pugx.org/lordsimal/cakephp-sentry/v)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![Total Downloads](http://poser.pugx.org/lordsimal/cakephp-sentry/downloads)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![Latest Unstable Version](http://poser.pugx.org/lordsimal/cakephp-sentry/v/unstable)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![License](http://poser.pugx.org/lordsimal/cakephp-sentry/license)](https://packagist.org/packages/lordsimal/cakephp-sentry) [![PHP Version Require](http://poser.pugx.org/lordsimal/cakephp-sentry/require/php)](https://packagist.org/packages/lordsimal/cakephp-sentry)
+[![codecov](https://codecov.io/gh/LordSimal/cakephp-sentry/branch/main/graph/badge.svg?token=99W08MNO6S)](https://codecov.io/gh/LordSimal/cakephp-sentry)
 
 CakePHP integration for Sentry.
 

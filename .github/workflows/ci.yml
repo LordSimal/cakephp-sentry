@@ -34,7 +34,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl
           ini-values: zend.assertions=1
-          coverage: none
+          coverage: pcov
 
       - name: Composer install
         uses: ramsey/composer-install@v2
@@ -44,7 +44,15 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit
+          if [[ ${{ matrix.php-version }} == '8.0' ]]; then
+            vendor/bin/phpunit --coverage-clover=coverage.xml
+          else
+            vendor/bin/phpunit
+          fi
+
+      - name: Code Coverage Report
+        if: success() && matrix.php-version == '8.0'
+        uses: codecov/codecov-action@v3
 
   cs-stan:
     name: Coding Standard & Static Analysis
