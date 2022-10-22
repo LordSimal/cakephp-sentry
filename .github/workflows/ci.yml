@@ -34,7 +34,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl
           ini-values: zend.assertions=1
-          coverage: pcov
+          coverage: none
 
       - name: Composer install
         uses: ramsey/composer-install@v2
@@ -44,11 +44,32 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          if [[ ${{ matrix.php-version }} == '8.1' && ${{ matrix.dependencies }} == 'highest' ]]; then
-            export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
-          else
-            vendor/bin/phpunit
-          fi
-      - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.1' && matrix.dependencies == 'highest'
-        uses: codecov/codecov-action@v3
+          vendor/bin/phpunit
+
+  cs-stan:
+    name: Coding Standard & Static Analysis
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: mbstring, intl
+          coverage: none
+          tools: cs2pr
+
+      - name: Composer Install
+        run: composer stan-setup
+
+      - name: Run phpcs
+        run: vendor/bin/phpcs --report=checkstyle src/ tests/ | cs2pr
+
+      - name: Run psalm
+        run: vendor/bin/psalm.phar --output-format=github
+
+      - name: Run phpstan
+        if: always()
+        run: vendor/bin/phpstan.phar analyse --error-format=github

@@ -10,11 +10,16 @@ use CakeSentry\Middleware\CakeSentryMiddleware;
 
 class Plugin extends BasePlugin
 {
+    /**
+     * @param \Cake\Http\MiddlewareQueue $middlewareQueue The current middleware queue object
+     * @return \Cake\Http\MiddlewareQueue
+     */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         if (Configure::read('CakeSentry.enableQueryLogging', false)) {
             $middlewareQueue = $middlewareQueue->add(new CakeSentryMiddleware());
         }
+
         return $middlewareQueue;
     }
 }

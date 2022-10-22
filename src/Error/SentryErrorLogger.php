@@ -49,7 +49,7 @@ class SentryErrorLogger implements ErrorLoggerInterface
         Throwable $exception,
         ?ServerRequestInterface $request = null,
         bool $includeTrace = false
-    ) {
+    ): void {
         $this->logger->logException($exception, $request, $includeTrace);
         $this->client->captureException($exception, $request);
     }
@@ -61,7 +61,7 @@ class SentryErrorLogger implements ErrorLoggerInterface
         PhpError $error,
         ?ServerRequestInterface $request = null,
         bool $includeTrace = false
-    ) {
+    ): void {
         $this->logger->logError($error, $request, $includeTrace);
         $this->client->captureError($error, $request);
     }

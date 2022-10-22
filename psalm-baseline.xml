@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.x-dev@">
+  <file src="src/Database/Log/CakeSentryLog.php">
+    <InternalProperty occurrences="1">
+      <code>$query-&gt;query</code>
+    </InternalProperty>
+  </file>
+  <file src="src/Plugin.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>Plugin</code>
+      <code>Plugin</code>
+      <code>Plugin</code>
+      <code>Plugin</code>
+      <code>Plugin</code>
+    </PropertyNotSetInConstructor>
+  </file>
+</files>
