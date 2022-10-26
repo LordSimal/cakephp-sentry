@@ -8,7 +8,7 @@ use Cake\Core\Configure;
 use Cake\Http\MiddlewareQueue;
 use CakeSentry\Middleware\CakeSentryMiddleware;
 
-class Plugin extends BasePlugin
+class CakeSentryPlugin extends BasePlugin
 {
     /**
      * @param \Cake\Http\MiddlewareQueue $middlewareQueue The current middleware queue object
