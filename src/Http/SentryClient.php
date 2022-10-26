@@ -13,7 +13,6 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Utility\Hash;
 use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ServerRequestInterface;
-use RuntimeException;
 use Sentry\Breadcrumb;
 use Sentry\SentrySdk;
 use Sentry\Severity;
@@ -40,7 +39,7 @@ class SentryClient
         ],
     ];
 
-    protected HubInterface $hub;
+    protected ?HubInterface $hub = null;
 
     /**
      * Loggers connected
@@ -72,15 +71,12 @@ class SentryClient
     protected function setupClient(): void
     {
         $config = $this->getConfig('sentry');
-        if (!Hash::check($config, 'dsn')) {
-            throw new RuntimeException('Sentry DSN not provided.');
+        if (Hash::check($config, 'dsn')) {
+            init($config);
+            $this->hub = SentrySdk::getCurrentHub();
+            $event = new Event('CakeSentry.Client.afterSetup', $this);
+            $this->getEventManager()->dispatch($event);
         }
-
-        init($config);
-        $this->hub = SentrySdk::getCurrentHub();
-
-        $event = new Event('CakeSentry.Client.afterSetup', $this);
-        $this->getEventManager()->dispatch($event);
     }
 
     /**
@@ -127,13 +123,15 @@ class SentryClient
                     $data['executionTimeMs'] = $query['took'];
                     $data['rows'] = $query['rows'];
 
-                    $this->getHub()->addBreadcrumb(new Breadcrumb(
-                        Breadcrumb::LEVEL_INFO,
-                        Breadcrumb::TYPE_DEFAULT,
-                        'sql.query',
-                        $query['query'],
-                        $data
-                    ));
+                    if ($this->hub) {
+                        $this->hub->addBreadcrumb(new Breadcrumb(
+                            Breadcrumb::LEVEL_INFO,
+                            Breadcrumb::TYPE_DEFAULT,
+                            'sql.query',
+                            $query['query'],
+                            $data
+                        ));
+                    }
                 }
             }
         }
@@ -207,9 +205,9 @@ class SentryClient
     /**
      * Accessor for current hub
      *
-     * @return \Sentry\State\HubInterface
+     * @return \Sentry\State\HubInterface|null
      */
-    public function getHub(): HubInterface
+    public function getHub(): ?HubInterface
     {
         return $this->hub;
     }

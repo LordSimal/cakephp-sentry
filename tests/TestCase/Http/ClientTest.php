@@ -59,15 +59,13 @@ final class ClientTest extends TestCase
     }
 
     /**
-     * Check constructor throws exception unless dsn is given
+     * Check constructor does not throw exception if no DSN is set
      */
     public function testSetupClientNotHasDsn(): void
     {
         Configure::delete('Sentry.dsn');
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Sentry DSN not provided.');
-
-        new SentryClient([]);
+        $client = new SentryClient([]);
+        $this->assertInstanceOf(SentryClient::class, $client);
     }
 
     /**
