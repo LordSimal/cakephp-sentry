@@ -154,7 +154,7 @@ class SentryClient
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('exception', 'request'));
         $eventManager->dispatch($event);
 
-        if ($extras) {
+        if ($extras && $this->hub) {
             $this->hub->configureScope(function (Scope $scope) use ($extras): void {
                 $scope->setExtras($extras);
             });
@@ -185,7 +185,7 @@ class SentryClient
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('error', 'request'));
         $eventManager->dispatch($event);
 
-        if ($extras) {
+        if ($extras && $this->hub) {
             $this->hub->configureScope(function (Scope $scope) use ($extras): void {
                 $scope->setExtras($extras);
             });
