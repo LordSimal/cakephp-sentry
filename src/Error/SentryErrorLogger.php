@@ -7,7 +7,6 @@ use Cake\Core\Configure;
 use Cake\Error\ErrorLogger;
 use Cake\Error\ErrorLoggerInterface;
 use Cake\Error\PhpError;
-use Cake\Http\ServerRequest;
 use Cake\Utility\Hash;
 use CakeSentry\Http\SentryClient;
 use Psr\Http\Message\ServerRequestInterface;
@@ -59,8 +58,6 @@ class SentryErrorLogger implements ErrorLoggerInterface
         $this->logger->logException($exception, $request, $includeTrace);
         if (Hash::check($this->config, 'dsn')) {
             $this->client->captureException($exception, $request);
-        } elseif ($request instanceof ServerRequest) {
-            $request->getFlash()->warning('Sentry DSN not provided.');
         }
     }
 
@@ -75,8 +72,6 @@ class SentryErrorLogger implements ErrorLoggerInterface
         $this->logger->logError($error, $request, $includeTrace);
         if (Hash::check($this->config, 'dsn')) {
             $this->client->captureError($error, $request);
-        } elseif ($request instanceof ServerRequest) {
-            $request->getFlash()->warning('Sentry DSN not provided.');
         }
     }
 }
