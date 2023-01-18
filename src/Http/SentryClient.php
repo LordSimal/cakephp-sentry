@@ -5,7 +5,6 @@ namespace CakeSentry\Http;
 
 use Cake\Core\Configure;
 use Cake\Core\InstanceConfigTrait;
-use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Cake\Error\PhpError;
 use Cake\Event\Event;
@@ -26,6 +25,7 @@ use function Sentry\init;
 
 class SentryClient
 {
+    /** @use \Cake\Event\EventDispatcherTrait<\CakeSentry\Http\SentryClient> */
     use EventDispatcherTrait;
     use InstanceConfigTrait;
 
@@ -44,8 +44,6 @@ class SentryClient
 
     /**
      * Loggers connected
-     *
-     * @var array
      */
     protected array $_loggers = [];
 
@@ -90,13 +88,10 @@ class SentryClient
 
         foreach ($configs as $name) {
             $connection = ConnectionManager::get($name);
-            if (
-                $connection->configName() === 'debug_kit'
-                || !$connection instanceof ConnectionInterface
-            ) {
+            if ($connection->configName() === 'debug_kit') {
                 continue;
             }
-            $logger = $connection->getLogger();
+            $logger = $connection->getDriver()->getLogger();
 
             if ($logger instanceof CakeSentryLog) {
                 $logger->setIncludeSchema($includeSchemaReflection);

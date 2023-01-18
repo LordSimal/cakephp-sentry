@@ -37,8 +37,9 @@ final class CakeSentryMiddlewareTest extends TestCase
         $configs = ConnectionManager::configured();
         foreach ($configs as $name) {
             $connection = ConnectionManager::get($name);
-            $this->assertTrue($connection->isQueryLoggingEnabled());
-            $this->assertSame(CakeSentryLog::class, get_class($connection->getLogger()));
+            $driver = $connection->getDriver();
+            $this->assertTrue($driver->config()['log']);
+            $this->assertSame(CakeSentryLog::class, get_class($driver->getLogger()));
         }
     }
 

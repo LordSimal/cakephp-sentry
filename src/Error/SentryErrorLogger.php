@@ -10,7 +10,6 @@ use Cake\Error\PhpError;
 use Cake\Utility\Hash;
 use CakeSentry\Http\SentryClient;
 use Psr\Http\Message\ServerRequestInterface;
-use RuntimeException;
 use Throwable;
 
 class SentryErrorLogger implements ErrorLoggerInterface
@@ -29,22 +28,6 @@ class SentryErrorLogger implements ErrorLoggerInterface
         $this->logger = new ErrorLogger($config);
         $this->client = new SentryClient($config);
         $this->config = Configure::read('Sentry');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function log(Throwable $exception, ?ServerRequestInterface $request = null): bool
-    {
-        throw new RuntimeException('This method of error logging should not be used anymore');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function logMessage($level, string $message, array $context = []): bool
-    {
-        throw new RuntimeException('This method of error logging should not be used anymore');
     }
 
     /**

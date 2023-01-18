@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'main'
+      - 'cake5'
   pull_request:
     branches:
       - '*'
@@ -18,10 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2']
+        php-version: [ '8.1', '8.2' ]
         dependencies: ['highest']
         include:
-          - php-version: '7.4'
+          - php-version: '8.1'
             dependencies: 'lowest'
           - php-version: '8.2'
             dependencies: 'highest'
@@ -45,14 +45,14 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          if [[ ${{ matrix.php-version }} == '8.2' ]]; then
+          if [[ ${{ matrix.php-version }} == '8.1' ]]; then
             vendor/bin/phpunit --coverage-clover=coverage.xml
           else
             vendor/bin/phpunit
           fi
 
       - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.2'
+        if: success() && matrix.php-version == '8.1'
         uses: codecov/codecov-action@v3
 
   cs-stan:
@@ -65,7 +65,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.1'
           extensions: mbstring, intl
           coverage: none
           tools: cs2pr

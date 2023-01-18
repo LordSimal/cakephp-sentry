@@ -30,38 +30,28 @@ class CakeSentryLog extends AbstractLogger
 {
     /**
      * Logs from the current request.
-     *
-     * @var array
      */
     protected array $_queries = [];
 
     /**
      * Decorated logger.
-     *
-     * @var \Psr\Log\LoggerInterface|null
      */
     protected ?LoggerInterface $_logger = null;
 
     /**
      * Name of the connection being logged.
-     *
-     * @var string
      */
     protected string $_connectionName;
 
     /**
      * Total time (ms) of all queries
-     *
-     * @var int
      */
-    protected int $_totalTime = 0;
+    protected float $_totalTime = 0;
 
     /**
      * Total rows of all queries
-     *
-     * @var int
      */
-    protected int $_totalRows = 0;
+    protected float $_totalRows = 0;
 
     /**
      * Set to true to capture schema reflection queries
@@ -121,9 +111,9 @@ class CakeSentryLog extends AbstractLogger
     /**
      * Get the total time
      *
-     * @return int
+     * @return float
      */
-    public function totalTime(): int
+    public function totalTime(): float
     {
         return $this->_totalTime;
     }
@@ -131,9 +121,9 @@ class CakeSentryLog extends AbstractLogger
     /**
      * Get the total rows
      *
-     * @return int
+     * @return float
      */
-    public function totalRows(): int
+    public function totalRows(): float
     {
         return $this->_totalRows;
     }
@@ -153,13 +143,15 @@ class CakeSentryLog extends AbstractLogger
             return;
         }
 
-        $this->_totalTime += $query->took;
-        $this->_totalRows += $query->numRows;
+        $context = $query->getContext();
+
+        $this->_totalTime += $context['took'];
+        $this->_totalRows += $context['numRows'];
 
         $this->_queries[] = [
             'query' => (string)$query,
-            'took' => $query->took,
-            'rows' => $query->numRows,
+            'took' => $context['took'],
+            'rows' => $context['numRows'],
         ];
     }
 
@@ -171,7 +163,9 @@ class CakeSentryLog extends AbstractLogger
      */
     protected function isSchemaQuery(LoggedQuery $query): bool
     {
-        $querystring = $query->query;
+        /** @psalm-suppress InternalMethod */
+        $context = $query->jsonSerialize();
+        $querystring = $context['query'];
 
         return // Multiple engines
             strpos($querystring, 'FROM information_schema') !== false ||

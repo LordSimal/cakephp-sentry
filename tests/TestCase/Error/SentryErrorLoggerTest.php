@@ -33,25 +33,6 @@ final class SentryErrorLoggerTest extends TestCase
     }
 
     /**
-     * Test for log()
-     */
-    public function testLogThrowsException()
-    {
-        $excpetion = new RuntimeException('some error');
-        $this->expectException(RuntimeException::class);
-        $this->subject->log($excpetion);
-    }
-
-    /**
-     * Test for logMessage()
-     */
-    public function testLogMessageThrowsException()
-    {
-        $this->expectException(RuntimeException::class);
-        $this->subject->logMessage(E_USER_WARNING, 'some error');
-    }
-
-    /**
      * Test for logException()
      */
     public function testLogException()

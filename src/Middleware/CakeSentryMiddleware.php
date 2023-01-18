@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace CakeSentry\Middleware;
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ResponseInterface;
@@ -53,21 +52,23 @@ class CakeSentryMiddleware implements MiddlewareInterface
 
         foreach ($configs as $name) {
             $connection = ConnectionManager::get($name);
-            if (
-                $connection->configName() === 'debug_kit'
-                || !$connection instanceof ConnectionInterface
-            ) {
+            if ($connection->configName() === 'debug_kit') {
                 continue;
             }
             $logger = null;
-            if ($connection->isQueryLoggingEnabled()) {
-                $logger = $connection->getLogger();
+            $driver = $connection->getDriver();
+            $driverConfig = $driver->config();
+            if ($driverConfig['log']) {
+                $logger = $driver->getLogger();
             }
 
             $logger = new CakeSentryLog($logger, $name, $includeSchemaReflection);
+            $driver->setLogger($logger);
 
-            $connection->enableQueryLogging();
-            $connection->setLogger($logger);
+            //$driverClass = get_class($driver);
+            //$newDriverConfig = ['log' => true] + $driverConfig;
+            //$adjustedDriver = new $driverClass($newDriverConfig);
+            //$adjustedDriver->setLogger($logger);
         }
     }
 }
