@@ -7,11 +7,13 @@ CakePHP integration for Sentry.
 
 ℹ️ This is a refactored version of https://github.com/Connehito/cake-sentry to remove deprecation warnings introduced in CakePHP 4.4
 
+ℹ️ If you are using CakePHP 4.4+ please use the 1.x version of this plugin
+
 ℹ️ If you are using CakePHP 3.x or 4.0 - 4.3 please use the plugin from Connehito linked above
 
 ## Requirements
-- PHP 7.4+ / PHP 8.0+
-- CakePHP 4.4+
+- PHP 8.1+
+- CakePHP 5+
 - and a [Sentry](https://sentry.io) account
 
 ## Installation
