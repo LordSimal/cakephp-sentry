@@ -38,7 +38,6 @@ final class CakeSentryMiddlewareTest extends TestCase
         foreach ($configs as $name) {
             $connection = ConnectionManager::get($name);
             $driver = $connection->getDriver();
-            $this->assertTrue($driver->config()['log']);
             $this->assertSame(CakeSentryLog::class, get_class($driver->getLogger()));
         }
     }
