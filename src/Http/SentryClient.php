@@ -14,6 +14,7 @@ use Cake\Utility\Hash;
 use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ServerRequestInterface;
 use Sentry\Breadcrumb;
+use Sentry\EventHint;
 use Sentry\SentrySdk;
 use Sentry\Severity;
 use Sentry\State\HubInterface;
@@ -194,9 +195,17 @@ class SentryClient
         $this->getQueryLoggers();
         $this->addQueryBreadcrumbs();
 
+        $stacktrace = $this->hub->getClient()
+            ->getStacktraceBuilder()
+            ->buildFromBacktrace($error->getTrace(), $error->getFile(), $error->getLine());
+        $hint = EventHint::fromArray([
+            'stacktrace' => $stacktrace,
+        ]);
+
         $lastEventId = captureMessage(
             $error->getMessage(),
-            Severity::fromError($error->getCode())
+            Severity::fromError($error->getCode()),
+            $hint
         );
         $event = new Event('CakeSentry.Client.afterCapture', $this, compact('error', 'request', 'lastEventId'));
         $eventManager->dispatch($event);
