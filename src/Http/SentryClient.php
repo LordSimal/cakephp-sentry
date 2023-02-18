@@ -198,12 +198,12 @@ class SentryClient
         if ($this->hub) {
             $client = $this->hub->getClient();
             if ($client) {
-              /** @psalm-suppress ArgumentTypeCoercion */
-              $stacktrace = $client->getStacktraceBuilder()
+                /** @psalm-suppress ArgumentTypeCoercion */
+                $stacktrace = $client->getStacktraceBuilder()
                 ->buildFromBacktrace($error->getTrace(), $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
-              $hint = EventHint::fromArray([
+                $hint = EventHint::fromArray([
                 'stacktrace' => $stacktrace,
-              ]);
+                ]);
             }
         }
 
