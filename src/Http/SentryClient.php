@@ -195,17 +195,22 @@ class SentryClient
         $this->getQueryLoggers();
         $this->addQueryBreadcrumbs();
 
-        $stacktrace = $this->hub->getClient()
-            ->getStacktraceBuilder()
-            ->buildFromBacktrace($error->getTrace(), $error->getFile(), $error->getLine());
-        $hint = EventHint::fromArray([
-            'stacktrace' => $stacktrace,
-        ]);
+        if ($this->hub) {
+            $client = $this->hub->getClient();
+            if ($client) {
+              /** @psalm-suppress ArgumentTypeCoercion */
+              $stacktrace = $client->getStacktraceBuilder()
+                ->buildFromBacktrace($error->getTrace(), $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
+              $hint = EventHint::fromArray([
+                'stacktrace' => $stacktrace,
+              ]);
+            }
+        }
 
         $lastEventId = captureMessage(
             $error->getMessage(),
             Severity::fromError($error->getCode()),
-            $hint
+            $hint ?? null
         );
         $event = new Event('CakeSentry.Client.afterCapture', $this, compact('error', 'request', 'lastEventId'));
         $eventManager->dispatch($event);
