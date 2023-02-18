@@ -11,10 +11,12 @@ use Cake\TestSuite\TestCase;
 use CakeSentry\Http\SentryClient;
 use Exception;
 use RuntimeException;
+use Sentry\ClientBuilder;
 use Sentry\ClientInterface;
 use Sentry\Event as SentryEvent;
 use Sentry\EventHint;
 use Sentry\EventId;
+use Sentry\Options;
 use Sentry\State\Hub;
 
 final class ClientTest extends TestCase
@@ -146,16 +148,16 @@ final class ClientTest extends TestCase
     public function testCaptureError(): void
     {
         $subject = new SentryClient([]);
-        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
-            'captureMessage' => null,
-        ]);
-        $subject->getHub()->bindClient($sentryClientP);
+        $options = new Options();
+        $clientBuilder = new ClientBuilder($options);
+        $client = $clientBuilder->getClient();
+        $subject->getHub()->bindClient($client);
 
-        $error = new PhpError(E_USER_WARNING, 'something wrong.');
+        $error = new PhpError(E_USER_WARNING, 'something wrong.', '/my/app/path/test.php', 123);
         $subject->captureError($error);
 
-        $result = $sentryClientP->captureMessage($error->getMessage());
-        $this->assertSame(null, $result);
+        $result = $client->captureMessage($error->getMessage());
+        $this->assertInstanceOf(EventId::class, $result);
     }
 
     /**
@@ -200,7 +202,7 @@ final class ClientTest extends TestCase
         $subject = new SentryClient([]);
 
         $extras = ['this is' => 'additional'];
-        $phpError = new PhpError(E_USER_WARNING, 'Some error');
+        $phpError = new PhpError(E_USER_WARNING, 'Some error', '/my/app/path/test.php', 123);
         $subject->captureError($phpError, null, $extras);
 
         $this->assertSame($extras, $actualEvent->getExtra());
@@ -236,11 +238,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureDispatchBeforeErrorCapture(): void
     {
-        $subject = new SentryClient([]);
-        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
-            'captureMessage' => null,
-        ]);
-        $subject->getHub()->bindClient($sentryClientP);
+        $subject = $this->getClient();
 
         $called = false;
         EventManager::instance()->on(
@@ -250,7 +248,7 @@ final class ClientTest extends TestCase
             }
         );
 
-        $phpError = new PhpError(E_USER_WARNING, 'Some error');
+        $phpError = new PhpError(E_USER_WARNING, 'Some error', '/my/app/path/test.php', 123);
         $subject->captureError($phpError, null, ['exception' => new Exception()]);
 
         $this->assertTrue($called);
@@ -261,13 +259,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureDispatchAfterExceptionCapture(): void
     {
-        $lastEventId = EventId::generate();
-
-        $subject = new SentryClient([]);
-        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
-            'captureException' => $lastEventId,
-        ]);
-        $subject->getHub()->bindClient($sentryClientP);
+        $subject = $this->getClient();
 
         $called = false;
         EventManager::instance()->on(
@@ -282,7 +274,7 @@ final class ClientTest extends TestCase
         $subject->captureException($phpError, null, ['exception' => new Exception()]);
 
         $this->assertTrue($called);
-        $this->assertSame($lastEventId, $actualLastEventId);
+        $this->assertInstanceOf(EventId::class, $actualLastEventId);
     }
 
     /**
@@ -290,13 +282,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureDispatchAfterErrorCapture(): void
     {
-        $lastEventId = EventId::generate();
-
-        $subject = new SentryClient([]);
-        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
-            'captureMessage' => $lastEventId,
-        ]);
-        $subject->getHub()->bindClient($sentryClientP);
+        $subject = $this->getClient();
 
         $called = false;
         EventManager::instance()->on(
@@ -307,10 +293,21 @@ final class ClientTest extends TestCase
             }
         );
 
-        $phpError = new PhpError(E_USER_WARNING, 'Some error');
+        $phpError = new PhpError(E_USER_WARNING, 'Some error', '/my/app/path/test.php', 123);
         $subject->captureError($phpError, null, ['exception' => new Exception()]);
 
         $this->assertTrue($called);
-        $this->assertSame($lastEventId, $actualLastEventId);
+        $this->assertInstanceOf(EventId::class, $actualLastEventId);
+    }
+
+    private function getClient(): SentryClient
+    {
+        $subject = new SentryClient([]);
+        $options = new Options();
+        $clientBuilder = new ClientBuilder($options);
+        $client = $clientBuilder->getClient();
+        $subject->getHub()->bindClient($client);
+
+        return $subject;
     }
 }
