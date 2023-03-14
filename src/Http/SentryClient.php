@@ -200,7 +200,7 @@ class SentryClient
             if ($client) {
                 /** @psalm-suppress ArgumentTypeCoercion */
                 $stacktrace = $client->getStacktraceBuilder()
-                    ->buildFromBacktrace($this->cleanedTrace($error->getTrace()), $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
+                ->buildFromBacktrace($this->cleanedTrace($error->getTrace()), $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
                 $hint = EventHint::fromArray([
                 'stacktrace' => $stacktrace,
                 ]);
