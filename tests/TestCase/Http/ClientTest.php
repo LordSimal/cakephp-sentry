@@ -161,6 +161,30 @@ final class ClientTest extends TestCase
     }
 
     /**
+     * Test capture error with unknown lines '??'
+     */
+    public function testCaptureErrorWithUnknownLines(): void
+    {
+        $subject = new SentryClient([]);
+        $options = new Options();
+        $clientBuilder = new ClientBuilder($options);
+        $client = $clientBuilder->getClient();
+        $subject->getHub()->bindClient($client);
+
+        $trace = [
+            [
+                'file' => '[internal]',
+                'line' => '??',
+            ],
+        ];
+        $error = new PhpError(E_USER_WARNING, 'something wrong.', '/my/app/path/test.php', 123, $trace);
+        $subject->captureError($error);
+
+        $result = $client->captureMessage($error->getMessage());
+        $this->assertInstanceOf(EventId::class, $result);
+    }
+
+    /**
      * Test capture exception pass cakephp-log's context as additional data
      */
     public function testCaptureExceptionWithAdditionalData(): void
