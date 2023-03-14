@@ -198,9 +198,10 @@ class SentryClient
         if ($this->hub) {
             $client = $this->hub->getClient();
             if ($client) {
+                $trace = $this->cleanedTrace($error->getTrace());
                 /** @psalm-suppress ArgumentTypeCoercion */
                 $stacktrace = $client->getStacktraceBuilder()
-                ->buildFromBacktrace($this->cleanedTrace($error->getTrace()), $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
+                ->buildFromBacktrace($trace, $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
                 $hint = EventHint::fromArray([
                 'stacktrace' => $stacktrace,
                 ]);
@@ -228,15 +229,16 @@ class SentryClient
 
     /**
      * @param array<array<string, int|string>> $traces
-     * @return array<array<string, int|string>>
+     * @return array<array<string, int>>
      */
     private function cleanedTrace(array $traces): array
     {
-        foreach($traces as $key => $trace) {
-            if (isset($trace['line']) && $trace['line'] === '??') {
+        foreach ($traces as $key => $trace) {
+            if (isset($trace['line']) && is_string($trace['line'])) {
                 $traces[$key]['line'] = 0;
             }
         }
+
         return $traces;
     }
 }

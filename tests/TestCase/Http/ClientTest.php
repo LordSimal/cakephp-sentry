@@ -175,7 +175,7 @@ final class ClientTest extends TestCase
             [
                 'file' => '[internal]',
                 'line' => '??',
-            ]
+            ],
         ];
         $error = new PhpError(E_USER_WARNING, 'something wrong.', '/my/app/path/test.php', 123, $trace);
         $subject->captureError($error);
