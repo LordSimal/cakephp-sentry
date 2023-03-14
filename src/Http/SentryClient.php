@@ -228,13 +228,13 @@ class SentryClient
     }
 
     /**
-     * @param array<array<string, int|string>> $traces
-     * @return array<array<string, int>>
+     * @param array<array<string, null|int|string|array>> $traces
+     * @return array<array<string, null|int|string|array>>
      */
     private function cleanedTrace(array $traces): array
     {
         foreach ($traces as $key => $trace) {
-            if (isset($trace['line']) && is_string($trace['line'])) {
+            if (isset($trace['line']) && $trace['line'] === '??') {
                 $traces[$key]['line'] = 0;
             }
         }
