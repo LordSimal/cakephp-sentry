@@ -234,7 +234,7 @@ class SentryClient
     private function cleanedTrace(array $traces): array
     {
         foreach ($traces as $key => $trace) {
-            if (isset($trace['line']) && $trace['line'] === '??') {
+            if (isset($trace['line']) && ($trace['line'] === '??' || $trace['line'] === '')) {
                 $traces[$key]['line'] = 0;
             }
         }
