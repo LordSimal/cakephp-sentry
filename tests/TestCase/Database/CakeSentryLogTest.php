@@ -93,7 +93,7 @@ final class CakeSentryLogTest extends TestCase
         $this->assertCount(1, $logger->queries());
     }
 
-    public function schemaQueryProvider()
+    public static function schemaQueryProvider()
     {
         return [
             // MySQL
