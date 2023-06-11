@@ -18,11 +18,6 @@
             "CakeSentry\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "CakeSentry\\Test\\": "tests/"
-        }
-    },
     "scripts": {
         "test": "phpunit",
         "cs-check": "phpcs --colors -p ./src ./tests",
