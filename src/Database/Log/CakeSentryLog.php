@@ -135,9 +135,7 @@ class CakeSentryLog extends AbstractLogger
     {
         $query = $context['query'];
 
-        if ($this->_logger) {
-            $this->_logger->log($level, $message, $context);
-        }
+        $this->_logger?->log($level, $message, $context);
 
         if ($this->_includeSchema === false && $this->isSchemaQuery($query)) {
             return;
@@ -168,18 +166,18 @@ class CakeSentryLog extends AbstractLogger
         $querystring = $context['query'];
 
         return // Multiple engines
-            strpos($querystring, 'FROM information_schema') !== false ||
+            str_contains($querystring, 'FROM information_schema') ||
             // Postgres
-            strpos($querystring, 'FROM pg_catalog') !== false ||
+            str_contains($querystring, 'FROM pg_catalog') ||
             // MySQL
-            strpos($querystring, 'SHOW TABLE') === 0 ||
-            strpos($querystring, 'SHOW FULL COLUMNS') === 0 ||
-            strpos($querystring, 'SHOW INDEXES') === 0 ||
+            str_starts_with($querystring, 'SHOW TABLE') ||
+            str_starts_with($querystring, 'SHOW FULL COLUMNS') ||
+            str_starts_with($querystring, 'SHOW INDEXES') ||
             // Sqlite
-            strpos($querystring, 'FROM sqlite_master') !== false ||
-            strpos($querystring, 'PRAGMA') === 0 ||
+            str_contains($querystring, 'FROM sqlite_master') ||
+            str_starts_with($querystring, 'PRAGMA') ||
             // Sqlserver
-            strpos($querystring, 'FROM INFORMATION_SCHEMA') !== false ||
-            strpos($querystring, 'FROM sys.') !== false;
+            str_contains($querystring, 'FROM INFORMATION_SCHEMA') ||
+            str_contains($querystring, 'FROM sys.');
     }
 }

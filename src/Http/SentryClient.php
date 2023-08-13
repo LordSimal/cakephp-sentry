@@ -8,6 +8,7 @@ use Cake\Core\InstanceConfigTrait;
 use Cake\Datasource\ConnectionManager;
 use Cake\Error\PhpError;
 use Cake\Event\Event;
+use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Utility\Hash;
 use CakeSentry\Database\Log\CakeSentryLog;
@@ -23,7 +24,10 @@ use function Sentry\captureException;
 use function Sentry\captureMessage;
 use function Sentry\init;
 
-class SentryClient
+/**
+ * @implements \Cake\Event\EventDispatcherInterface<\CakeSentry\Http\SentryClient>
+ */
+class SentryClient implements EventDispatcherInterface
 {
     /** @use \Cake\Event\EventDispatcherTrait<\CakeSentry\Http\SentryClient> */
     use EventDispatcherTrait;
@@ -119,15 +123,15 @@ class SentryClient
                     $data['executionTimeMs'] = $query['took'];
                     $data['rows'] = $query['rows'];
 
-                    if ($this->hub) {
-                        $this->hub->addBreadcrumb(new Breadcrumb(
+                    $this->hub?->addBreadcrumb(
+                        new Breadcrumb(
                             Breadcrumb::LEVEL_INFO,
                             Breadcrumb::TYPE_DEFAULT,
                             'sql.query',
                             $query['query'],
                             $data
-                        ));
-                    }
+                        )
+                    );
                 }
             }
         }
