@@ -4,7 +4,7 @@
     "type": "cakephp-plugin",
     "require": {
         "php": "^8.1",
-        "cakephp/cakephp": "5.x-dev",
+        "cakephp/cakephp": "^5.0.0",
         "sentry/sdk": "^3.3"
     },
     "require-dev": {
@@ -32,8 +32,6 @@
         "psalm-baseline": "tools/psalm --set-baseline=psalm-baseline.xml",
         "stan-setup": "phive install"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "config": {
         "sort-packages": true,
         "allow-plugins": {
