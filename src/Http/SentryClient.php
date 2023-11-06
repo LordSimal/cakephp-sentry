@@ -4,13 +4,11 @@ declare(strict_types=1);
 namespace CakeSentry\Http;
 
 use Cake\Core\Configure;
-use Cake\Core\InstanceConfigTrait;
 use Cake\Datasource\ConnectionManager;
 use Cake\Error\PhpError;
 use Cake\Event\Event;
 use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
-use Cake\Utility\Hash;
 use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ServerRequestInterface;
 use Sentry\EventHint;
@@ -21,7 +19,6 @@ use Sentry\State\Scope;
 use Throwable;
 use function Sentry\captureException;
 use function Sentry\captureMessage;
-use function Sentry\init;
 
 /**
  * @implements \Cake\Event\EventDispatcherInterface<\CakeSentry\Http\SentryClient>
@@ -30,21 +27,9 @@ class SentryClient implements EventDispatcherInterface
 {
     /** @use \Cake\Event\EventDispatcherTrait<\CakeSentry\Http\SentryClient> */
     use EventDispatcherTrait;
-    use InstanceConfigTrait;
     use QuerySpanTrait;
 
-    protected array $_defaultConfig = [
-        'sentry' => [
-            'prefixes' => [
-                APP,
-            ],
-            'in_app_exclude' => [
-                ROOT . DS . 'vendor' . DS,
-            ],
-        ],
-    ];
-
-    protected ?HubInterface $hub = null;
+    protected HubInterface $hub;
 
     /**
      * Loggers connected
@@ -52,34 +37,11 @@ class SentryClient implements EventDispatcherInterface
     protected array $_loggers = [];
 
     /**
-     * Client constructor.
-     *
-     * @param array $config config for uses Sentry
+     * Initialize the hub for this client
      */
-    public function __construct(array $config)
+    public function __construct()
     {
-        $userConfig = Configure::read('Sentry');
-        if ($userConfig) {
-            $this->_defaultConfig['sentry'] = array_merge($this->_defaultConfig['sentry'], $userConfig);
-        }
-        $this->setConfig($config);
-        $this->setupClient();
-    }
-
-    /**
-     * Init sentry client
-     *
-     * @return void
-     */
-    protected function setupClient(): void
-    {
-        $config = $this->getConfig('sentry');
-        if (Hash::check($config, 'dsn')) {
-            init($config);
-            $this->hub = SentrySdk::getCurrentHub();
-            $event = new Event('CakeSentry.Client.afterSetup', $this);
-            $this->getEventManager()->dispatch($event);
-        }
+        $this->hub = SentrySdk::getCurrentHub();
     }
 
     /**
@@ -142,7 +104,7 @@ class SentryClient implements EventDispatcherInterface
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('exception', 'request'));
         $eventManager->dispatch($event);
 
-        if ($extras && $this->hub) {
+        if ($extras) {
             $this->hub->configureScope(function (Scope $scope) use ($extras): void {
                 $scope->setExtras($extras);
             });
@@ -173,7 +135,7 @@ class SentryClient implements EventDispatcherInterface
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('error', 'request'));
         $eventManager->dispatch($event);
 
-        if ($extras && $this->hub) {
+        if ($extras) {
             $this->hub->configureScope(function (Scope $scope) use ($extras): void {
                 $scope->setExtras($extras);
             });
@@ -182,17 +144,15 @@ class SentryClient implements EventDispatcherInterface
         $this->getQueryLoggers();
         $this->addQueryData();
 
-        if ($this->hub) {
-            $client = $this->hub->getClient();
-            if ($client) {
-                $trace = $this->cleanedTrace($error->getTrace());
-                /** @psalm-suppress ArgumentTypeCoercion */
-                $stacktrace = $client->getStacktraceBuilder()
+        $client = $this->hub->getClient();
+        if ($client) {
+            $trace = $this->cleanedTrace($error->getTrace());
+            /** @psalm-suppress ArgumentTypeCoercion */
+            $stacktrace = $client->getStacktraceBuilder()
                 ->buildFromBacktrace($trace, $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
-                $hint = EventHint::fromArray([
+            $hint = EventHint::fromArray([
                 'stacktrace' => $stacktrace,
-                ]);
-            }
+            ]);
         }
 
         $lastEventId = captureMessage(
@@ -207,9 +167,9 @@ class SentryClient implements EventDispatcherInterface
     /**
      * Accessor for current hub
      *
-     * @return \Sentry\State\HubInterface|null
+     * @return \Sentry\State\HubInterface
      */
-    public function getHub(): ?HubInterface
+    public function getHub(): HubInterface
     {
         return $this->hub;
     }

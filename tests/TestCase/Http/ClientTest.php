@@ -8,6 +8,7 @@ use Cake\Error\PhpError;
 use Cake\Event\Event;
 use Cake\Event\EventManager;
 use Cake\TestSuite\TestCase;
+use CakeSentry\CakeSentryInit;
 use CakeSentry\Http\SentryClient;
 use Exception;
 use RuntimeException;
@@ -36,28 +37,9 @@ final class ClientTest extends TestCase
      */
     public function testSetupClient(): void
     {
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
 
         $this->assertInstanceOf(Hub::class, $subject->getHub());
-    }
-
-    /**
-     * Check the configuration values are merged into the default-config.
-     */
-    public function testSetUpClientMergeConfig(): void
-    {
-        $userConfig = [
-            'dsn' => false,
-            'in_app_exclude' => ['/app/vendor', '/app/tmp',],
-            'server_name' => 'test-server',
-        ];
-
-        Configure::write('Sentry', $userConfig);
-        $subject = new SentryClient([]);
-
-        $this->assertSame([APP], $subject->getConfig('sentry.prefixes'), 'Default value not applied');
-        $this->assertSame($userConfig['in_app_exclude'], $subject->getConfig('sentry.in_app_exclude'), 'Default value is not overwritten');
-        $this->assertSame(false, $subject->getConfig('sentry.dsn'), 'Set value is not addes');
     }
 
     /**
@@ -66,7 +48,7 @@ final class ClientTest extends TestCase
     public function testSetupClientNotHasDsn(): void
     {
         Configure::delete('Sentry.dsn');
-        $client = new SentryClient([]);
+        $client = new SentryClient();
         $this->assertInstanceOf(SentryClient::class, $client);
     }
 
@@ -77,7 +59,7 @@ final class ClientTest extends TestCase
     {
         Configure::write('Sentry.server_name', 'test-server');
 
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
         $options = $subject->getHub()->getClient()->getOptions();
 
         $this->assertSame('test-server', $options->getServerName());
@@ -93,7 +75,8 @@ final class ClientTest extends TestCase
         };
         Configure::write('Sentry.before_send', $callback);
 
-        $subject = new SentryClient([]);
+        CakeSentryInit::init();
+        $subject = new SentryClient();
         $actual = $subject
             ->getHub()
             ->getClient()
@@ -119,7 +102,8 @@ final class ClientTest extends TestCase
             }
         );
 
-        new SentryClient([]);
+        CakeSentryInit::init();
+        new SentryClient();
 
         $this->assertTrue($called);
     }
@@ -129,7 +113,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureException(): void
     {
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
         $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
             'captureException' => null,
         ]);
@@ -147,7 +131,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureError(): void
     {
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
         $options = new Options();
         $clientBuilder = new ClientBuilder($options);
         $client = $clientBuilder->getClient();
@@ -165,7 +149,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureErrorWithUnknownLines(): void
     {
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
         $options = new Options();
         $clientBuilder = new ClientBuilder($options);
         $client = $clientBuilder->getClient();
@@ -199,7 +183,8 @@ final class ClientTest extends TestCase
         ];
 
         Configure::write('Sentry', $userConfig);
-        $subject = new SentryClient([]);
+        CakeSentryInit::init();
+        $subject = new SentryClient();
 
         $extras = ['this is' => 'additional'];
         $exception = new RuntimeException('Some error');
@@ -223,7 +208,8 @@ final class ClientTest extends TestCase
         ];
 
         Configure::write('Sentry', $userConfig);
-        $subject = new SentryClient([]);
+        CakeSentryInit::init();
+        $subject = new SentryClient();
 
         $extras = ['this is' => 'additional'];
         $phpError = new PhpError(E_USER_WARNING, 'Some error', '/my/app/path/test.php', 123);
@@ -237,7 +223,7 @@ final class ClientTest extends TestCase
      */
     public function testCaptureDispatchBeforeExceptionCapture(): void
     {
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
         $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
             'captureException' => null,
         ]);
@@ -326,7 +312,7 @@ final class ClientTest extends TestCase
 
     private function getClient(): SentryClient
     {
-        $subject = new SentryClient([]);
+        $subject = new SentryClient();
         $options = new Options();
         $clientBuilder = new ClientBuilder($options);
         $client = $clientBuilder->getClient();

@@ -26,7 +26,7 @@ class SentryErrorLogger implements ErrorLoggerInterface
     public function __construct(array $config)
     {
         $this->logger = new ErrorLogger($config);
-        $this->client = new SentryClient($config);
+        $this->client = new SentryClient();
         $this->config = Configure::read('Sentry');
     }
 

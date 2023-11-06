@@ -27,7 +27,7 @@ trait QuerySpanTrait
      */
     public function addTransactionSpan(LoggedQuery $query, ?string $connectionName = null): void
     {
-        $parentSpan = $this->hub?->getSpan();
+        $parentSpan = $this->hub->getSpan();
         if ($parentSpan === null) {
             return;
         }
@@ -72,8 +72,8 @@ trait QuerySpanTrait
      */
     protected function pushSpan(Span $span): void
     {
-        $this->parentSpanStack[] = $this->hub?->getSpan();
-        $this->hub?->setSpan($span);
+        $this->parentSpanStack[] = $this->hub->getSpan();
+        $this->hub->setSpan($span);
         $this->currentSpanStack[] = $span;
     }
 
@@ -87,7 +87,7 @@ trait QuerySpanTrait
         }
 
         $parent = array_pop($this->parentSpanStack);
-        $this->hub?->setSpan($parent);
+        $this->hub->setSpan($parent);
 
         return array_pop($this->currentSpanStack);
     }
