@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace CakeSentry\Test\Database;
 
+use Cake\Core\Configure;
 use Cake\Database\Log\LoggedQuery;
 use Cake\TestSuite\TestCase;
 use CakeSentry\Database\Log\CakeSentryLog;
@@ -21,6 +22,7 @@ final class CakeSentryLogTest extends TestCase
     {
         parent::setUp();
         $this->logger = new CakeSentryLog(null, 'test');
+        Configure::write('Sentry.dsn', 'https://yourtoken@example.com/yourproject/1');
     }
 
     /**
@@ -32,9 +34,9 @@ final class CakeSentryLogTest extends TestCase
     {
         $query = new LoggedQuery();
         $query->setContext([
-          'query' => 'SELECT * FROM posts',
-          'took' => 10,
-          'numRows' => 5,
+            'query' => 'SELECT * FROM posts',
+            'took' => 10,
+            'numRows' => 5,
         ]);
 
         $this->assertCount(0, $this->logger->queries());
@@ -43,11 +45,13 @@ final class CakeSentryLogTest extends TestCase
         $this->assertCount(1, $this->logger->queries());
         $this->assertSame(10.0, $this->logger->totalTime());
         $this->assertSame(5.0, $this->logger->totalRows());
+        $this->assertSame('', $this->logger->role());
 
         $this->logger->log(LogLevel::DEBUG, (string)$query, ['query' => $query]);
         $this->assertCount(2, $this->logger->queries());
         $this->assertSame(20.0, $this->logger->totalTime());
         $this->assertSame(10.0, $this->logger->totalRows());
+        $this->assertSame('', $this->logger->role());
     }
 
     /**

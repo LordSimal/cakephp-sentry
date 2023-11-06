@@ -64,11 +64,6 @@ class CakeSentryMiddleware implements MiddlewareInterface
 
             $logger = new CakeSentryLog($logger, $name, $includeSchemaReflection);
             $driver->setLogger($logger);
-
-            //$driverClass = get_class($driver);
-            //$newDriverConfig = ['log' => true] + $driverConfig;
-            //$adjustedDriver = new $driverClass($newDriverConfig);
-            //$adjustedDriver->setLogger($logger);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace CakeSentry\Database\Log;
 use Cake\Database\Log\LoggedQuery;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Sentry\State\HubInterface;
 
 /**
  * CakeSentry Query logger (originated from DebugKit Query logged)
@@ -31,27 +32,32 @@ class CakeSentryLog extends AbstractLogger
     /**
      * Logs from the current request.
      */
-    protected array $_queries = [];
+    protected array $queries = [];
 
     /**
      * Decorated logger.
      */
-    protected ?LoggerInterface $_logger = null;
+    protected ?LoggerInterface $logger = null;
 
     /**
      * Name of the connection being logged.
      */
-    protected string $_connectionName;
+    protected string $connectionName;
 
     /**
      * Total time (ms) of all queries
      */
-    protected float $_totalTime = 0;
+    protected float $totalTime = 0;
 
     /**
      * Total rows of all queries
      */
-    protected float $_totalRows = 0;
+    protected float $totalRows = 0;
+
+    /**
+     * The connection role the driver behind this query has
+     */
+    protected string $role = 'write';
 
     /**
      * Set to true to capture schema reflection queries
@@ -59,7 +65,12 @@ class CakeSentryLog extends AbstractLogger
      *
      * @var bool
      */
-    protected bool $_includeSchema = false;
+    protected bool $includeSchema = false;
+
+    /**
+     * @var \Sentry\State\HubInterface|null
+     */
+    protected ?HubInterface $hub = null;
 
     /**
      * Constructor
@@ -70,9 +81,9 @@ class CakeSentryLog extends AbstractLogger
      */
     public function __construct(?LoggerInterface $logger, string $name, bool $includeSchema = false)
     {
-        $this->_logger = $logger;
-        $this->_connectionName = $name;
-        $this->_includeSchema = $includeSchema;
+        $this->logger = $logger;
+        $this->connectionName = $name;
+        $this->includeSchema = $includeSchema;
     }
 
     /**
@@ -83,7 +94,7 @@ class CakeSentryLog extends AbstractLogger
      */
     public function setIncludeSchema(bool $value)
     {
-        $this->_includeSchema = $value;
+        $this->includeSchema = $value;
 
         return $this;
     }
@@ -95,17 +106,17 @@ class CakeSentryLog extends AbstractLogger
      */
     public function name(): string
     {
-        return $this->_connectionName;
+        return $this->connectionName;
     }
 
     /**
      * Get the stored logs.
      *
-     * @return array
+     * @return array<\Cake\Database\Log\LoggedQuery>
      */
     public function queries(): array
     {
-        return $this->_queries;
+        return $this->queries;
     }
 
     /**
@@ -115,7 +126,7 @@ class CakeSentryLog extends AbstractLogger
      */
     public function totalTime(): float
     {
-        return $this->_totalTime;
+        return $this->totalTime;
     }
 
     /**
@@ -125,7 +136,17 @@ class CakeSentryLog extends AbstractLogger
      */
     public function totalRows(): float
     {
-        return $this->_totalRows;
+        return $this->totalRows;
+    }
+
+    /**
+     * The connection role the driver behind this query has
+     *
+     * @return string
+     */
+    public function role(): string
+    {
+        return $this->role;
     }
 
     /**
@@ -133,24 +154,22 @@ class CakeSentryLog extends AbstractLogger
      */
     public function log($level, $message, array $context = []): void
     {
+        /** @var \Cake\Database\Log\LoggedQuery $query */
         $query = $context['query'];
 
-        $this->_logger?->log($level, $message, $context);
+        $this->logger?->log($level, $message, $context);
 
-        if ($this->_includeSchema === false && $this->isSchemaQuery($query)) {
+        if ($this->includeSchema === false && $this->isSchemaQuery($query)) {
             return;
         }
 
         $context = $query->getContext();
 
-        $this->_totalTime += $context['took'];
-        $this->_totalRows += $context['numRows'];
+        $this->totalTime += $context['took'];
+        $this->totalRows += $context['numRows'];
+        $this->role = $context['role'];
 
-        $this->_queries[] = [
-            'query' => (string)$query,
-            'took' => $context['took'],
-            'rows' => $context['numRows'],
-        ];
+        $this->queries[] = $query;
     }
 
     /**
@@ -161,8 +180,7 @@ class CakeSentryLog extends AbstractLogger
      */
     protected function isSchemaQuery(LoggedQuery $query): bool
     {
-        /** @psalm-suppress InternalMethod */
-        $context = $query->jsonSerialize();
+        $context = $query->getContext();
         $querystring = $context['query'];
 
         return // Multiple engines
