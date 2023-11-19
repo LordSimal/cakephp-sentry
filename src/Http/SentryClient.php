@@ -75,22 +75,25 @@ class SentryClient implements EventDispatcherInterface
     {
         if ($this->_loggers) {
             foreach ($this->_loggers as $logger) {
+                /** @var array<\Cake\Database\Log\LoggedQuery> $queries */
                 $queries = $logger->queries();
                 if (empty($queries)) {
                     continue;
                 }
 
                 foreach ($queries as $query) {
+                    $context = $query->getContext();
                     $data = ['connectionName' => $logger->name()];
-                    $data['executionTimeMs'] = $query['took'];
-                    $data['rows'] = $query['rows'];
+                    $data['executionTimeMs'] = $context['took'];
+                    $data['rows'] = $context['numRows'];
+                    $data['role'] = $context['role'];
 
-                    $this->hub?->addBreadcrumb(
+                    $this->hub->addBreadcrumb(
                         new Breadcrumb(
                             level: Breadcrumb::LEVEL_INFO,
                             type: Breadcrumb::TYPE_DEFAULT,
                             category: 'sql.query',
-                            message: $query['query'],
+                            message: $context['query'],
                             metadata: $data
                         )
                     );
