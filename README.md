@@ -15,6 +15,7 @@ CakePHP integration for Sentry.
 - PHP 8.1+
 - CakePHP 5+
 - and a [Sentry](https://sentry.io) account
+  - if you use self hosted sentry make sure you are on at least version `>= v20.6.0` 
 
 ## Installation
 ```
@@ -220,6 +221,15 @@ as well as set the corresponding [Sentry SDK options](https://docs.sentry.io/pla
     'traces_sample_rate' => 1,
 ]
 ```
+
+## Upgrade from 2 to 3
+
+There are a few major changes from 2.0 to 3.0
+
+- The Sentry PHP SDK was upgraded from `^3.3` to [^4.0](https://github.com/getsentry/sentry-php/releases/tag/4.0.0)
+- `CakeSentryMiddleware` has been renamed to `CakeSentryQueryMiddleware`
+- Properties are not prefixed `_` anymore
+- The `CakeSentryPerformanceMiddleware` has been added to add support for the [Performance Monitoring Feature](https://docs.sentry.io/product/performance/)
 
 ## License
 The plugin is available as open source under the terms of the [MIT License](https://github.com/lordsimal/cakephp-sentry/blob/master/LICENSE).
