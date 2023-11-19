@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace CakeSentry\Http;
+namespace CakeSentry;
 
 use Cake\Database\Log\LoggedQuery;
+use Sentry\SentrySdk;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
@@ -27,7 +28,7 @@ trait QuerySpanTrait
      */
     public function addTransactionSpan(LoggedQuery $query, ?string $connectionName = null): void
     {
-        $parentSpan = $this->hub->getSpan();
+        $parentSpan = SentrySdk::getCurrentHub()->getSpan();
         if ($parentSpan === null) {
             return;
         }
@@ -72,8 +73,8 @@ trait QuerySpanTrait
      */
     protected function pushSpan(Span $span): void
     {
-        $this->parentSpanStack[] = $this->hub->getSpan();
-        $this->hub->setSpan($span);
+        $this->parentSpanStack[] = SentrySdk::getCurrentHub()->getSpan();
+        SentrySdk::getCurrentHub()->setSpan($span);
         $this->currentSpanStack[] = $span;
     }
 
@@ -87,7 +88,7 @@ trait QuerySpanTrait
         }
 
         $parent = array_pop($this->parentSpanStack);
-        $this->hub->setSpan($parent);
+        SentrySdk::getCurrentHub()->setSpan($parent);
 
         return array_pop($this->currentSpanStack);
     }

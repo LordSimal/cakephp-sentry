@@ -13,9 +13,9 @@ declare(strict_types=1);
  */
 namespace CakeSentry\Middleware;
 
-use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use CakeSentry\Database\Log\CakeSentryLog;
+use CakeSentry\QuerySpanTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -27,10 +27,12 @@ use Sentry\Tracing\TransactionSource;
 use function Sentry\startTransaction;
 
 /**
- * Middleware that enables query logging for exception and error capturing in sentry
+ * Middleware that sets the first span in sentry for performance monitoring
  */
-class CakeSentryMiddleware implements MiddlewareInterface
+class CakeSentryPerformanceMiddleware implements MiddlewareInterface
 {
+    use QuerySpanTrait;
+
     /**
      * Invoke the middleware.
      *
@@ -69,13 +71,13 @@ class CakeSentryMiddleware implements MiddlewareInterface
 
         SentrySdk::getCurrentHub()->setSpan($span);
 
-        $this->enableQueryLogging();
-
         $response = $handler->handle($request);
         // We don't want to trace 404 responses as they are not relevant for performance monitoring.
         if ($response->getStatusCode() === 404) {
             $transaction->setSampled(false);
         }
+
+        $this->addQueryData();
 
         $span->setHttpStatus($response->getStatusCode());
         $span->finish();
@@ -91,10 +93,9 @@ class CakeSentryMiddleware implements MiddlewareInterface
     /**
      * @return void
      */
-    protected function enableQueryLogging(): void
+    protected function addQueryData(): void
     {
         $configs = ConnectionManager::configured();
-        $includeSchemaReflection = (bool)Configure::read('CakeSentry.includeSchemaReflection');
 
         foreach ($configs as $name) {
             $connection = ConnectionManager::get($name);
@@ -106,10 +107,12 @@ class CakeSentryMiddleware implements MiddlewareInterface
             $driverConfig = $driver->config();
             if ($driverConfig['log']) {
                 $logger = $driver->getLogger();
+                if ($logger instanceof CakeSentryLog) {
+                    foreach ($logger->queries() as $query) {
+                        $this->addTransactionSpan($query, $name);
+                    }
+                }
             }
-
-            $logger = new CakeSentryLog($logger, $name, $includeSchemaReflection);
-            $driver->setLogger($logger);
         }
     }
 }

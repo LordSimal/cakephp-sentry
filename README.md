@@ -201,5 +201,25 @@ If you want queries related to schema reflection also inside your events then yo
 ]
 ```
 
+### Performance monitoring (optional)
+
+If you want to use the performance monitoring feature of sentry you have to enable these 2 settings
+
+```php
+'CakeSentry' => [
+    'enableQueryLogging' => true,
+    'enablePerformanceMonitoring' => true
+]
+```
+
+as well as set the corresponding [Sentry SDK options](https://docs.sentry.io/platforms/php/performance/#configure)
+
+```php
+'Sentry' => [
+    'dsn' => '<sentry-dsn-url>',
+    'traces_sample_rate' => 1,
+]
+```
+
 ## License
 The plugin is available as open source under the terms of the [MIT License](https://github.com/lordsimal/cakephp-sentry/blob/master/LICENSE).

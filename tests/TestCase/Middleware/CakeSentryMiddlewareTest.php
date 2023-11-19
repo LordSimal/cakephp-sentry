@@ -8,7 +8,7 @@ use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use CakeSentry\Database\Log\CakeSentryLog;
-use CakeSentry\Middleware\CakeSentryMiddleware;
+use CakeSentry\Middleware\CakeSentryQueryMiddleware;
 use Psr\Http\Server\RequestHandlerInterface;
 
 final class CakeSentryMiddlewareTest extends TestCase
@@ -30,7 +30,7 @@ final class CakeSentryMiddlewareTest extends TestCase
             ->method('handle')
             ->willReturn($response);
 
-        $middleware = new CakeSentryMiddleware();
+        $middleware = new CakeSentryQueryMiddleware();
         $response = $middleware->process($request, $handler);
         $this->assertInstanceOf(Response::class, $response, 'Should return the response');
 

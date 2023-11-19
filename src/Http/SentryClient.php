@@ -11,6 +11,7 @@ use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
 use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ServerRequestInterface;
+use Sentry\Breadcrumb;
 use Sentry\EventHint;
 use Sentry\SentrySdk;
 use Sentry\Severity;
@@ -27,7 +28,6 @@ class SentryClient implements EventDispatcherInterface
 {
     /** @use \Cake\Event\EventDispatcherTrait<\CakeSentry\Http\SentryClient> */
     use EventDispatcherTrait;
-    use QuerySpanTrait;
 
     protected HubInterface $hub;
 
@@ -67,11 +67,11 @@ class SentryClient implements EventDispatcherInterface
     }
 
     /**
-     * Add an extra span to the event for each query executed in each logger
+     * Add an extra breadcrumb to the event foreach query executed in each logger
      *
      * @return void
      */
-    protected function addQueryData(): void
+    protected function addQueryBreadcrumbs(): void
     {
         if ($this->_loggers) {
             foreach ($this->_loggers as $logger) {
@@ -81,7 +81,19 @@ class SentryClient implements EventDispatcherInterface
                 }
 
                 foreach ($queries as $query) {
-                    $this->addTransactionSpan($query, $logger->name());
+                    $data = ['connectionName' => $logger->name()];
+                    $data['executionTimeMs'] = $query['took'];
+                    $data['rows'] = $query['rows'];
+
+                    $this->hub?->addBreadcrumb(
+                        new Breadcrumb(
+                            level: Breadcrumb::LEVEL_INFO,
+                            type: Breadcrumb::TYPE_DEFAULT,
+                            category: 'sql.query',
+                            message: $query['query'],
+                            metadata: $data
+                        )
+                    );
                 }
             }
         }
@@ -111,7 +123,7 @@ class SentryClient implements EventDispatcherInterface
         }
 
         $this->getQueryLoggers();
-        $this->addQueryData();
+        $this->addQueryBreadcrumbs();
 
         $lastEventId = captureException($exception);
         $event = new Event('CakeSentry.Client.afterCapture', $this, compact('exception', 'request', 'lastEventId'));
@@ -142,7 +154,7 @@ class SentryClient implements EventDispatcherInterface
         }
 
         $this->getQueryLoggers();
-        $this->addQueryData();
+        $this->addQueryBreadcrumbs();
 
         $client = $this->hub->getClient();
         if ($client) {
