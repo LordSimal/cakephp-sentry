@@ -108,9 +108,7 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
             if ($driverConfig['log']) {
                 $logger = $driver->getLogger();
                 if ($logger instanceof CakeSentryLog) {
-                    foreach ($logger->queries() as $query) {
-                        $this->addTransactionSpan($query, $name);
-                    }
+                    $logger->setPerformanceMonitoring(true);
                 }
             }
         }

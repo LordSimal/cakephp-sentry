@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace CakeSentry\Database\Log;
 
 use Cake\Database\Log\LoggedQuery;
+use CakeSentry\QuerySpanTrait;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Sentry\State\HubInterface;
@@ -29,6 +30,8 @@ use Sentry\State\HubInterface;
  */
 class CakeSentryLog extends AbstractLogger
 {
+    use QuerySpanTrait;
+
     /**
      * Logs from the current request.
      */
@@ -71,6 +74,11 @@ class CakeSentryLog extends AbstractLogger
      * @var \Sentry\State\HubInterface|null
      */
     protected ?HubInterface $hub = null;
+
+    /**
+     * @var bool
+     */
+    protected bool $enablePerformanceMonitoring = false;
 
     /**
      * Constructor
@@ -163,6 +171,10 @@ class CakeSentryLog extends AbstractLogger
             return;
         }
 
+        if ($this->enablePerformanceMonitoring) {
+            $this->addTransactionSpan($query, $this->connectionName);
+        }
+
         $context = $query->getContext();
 
         $this->totalTime += $context['took'];
@@ -197,5 +209,22 @@ class CakeSentryLog extends AbstractLogger
             // Sqlserver
             str_contains($querystring, 'FROM INFORMATION_SCHEMA') ||
             str_contains($querystring, 'FROM sys.');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPerformanceMonitoringEnabled(): bool
+    {
+        return $this->enablePerformanceMonitoring;
+    }
+
+    /**
+     * @param bool $enablePerformanceMonitoring
+     * @return void
+     */
+    public function setPerformanceMonitoring(bool $enablePerformanceMonitoring): void
+    {
+        $this->enablePerformanceMonitoring = $enablePerformanceMonitoring;
     }
 }
