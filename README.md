@@ -222,6 +222,15 @@ as well as set the corresponding [Sentry SDK options](https://docs.sentry.io/pla
 ]
 ```
 
+to see SQL query execution and duration inside the performance monitoring section of sentry make sure to enable logging for your desired datasource like so:
+```
+'Datasources' => [
+    'default' => [
+        'log' => true
+    ]
+]
+```
+
 ## Upgrade from 2 to 3
 
 There are a few major changes from 2.0 to 3.0
