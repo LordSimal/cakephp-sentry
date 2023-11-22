@@ -71,13 +71,13 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
 
         SentrySdk::getCurrentHub()->setSpan($span);
 
+        $this->addQueryData();
+
         $response = $handler->handle($request);
         // We don't want to trace 404 responses as they are not relevant for performance monitoring.
         if ($response->getStatusCode() === 404) {
             $transaction->setSampled(false);
         }
-
-        $this->addQueryData();
 
         $span->setHttpStatus($response->getStatusCode());
         $span->finish();
