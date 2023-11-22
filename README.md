@@ -16,6 +16,13 @@ CakePHP integration for Sentry.
 - CakePHP 5+
 - and a [Sentry](https://sentry.io) account
 
+## Version table
+|     | PHP              | CakePHP | self-hosted Sentry |
+|-----|------------------|---------|--------------------|
+| 1.x | `^7.4 \|\| ^8.0` | `^4.4`  | 🤷🏻               |
+| 2.x | `^8.1`           | `^5.0`  | 🤷🏻               |
+| 3.x | `^8.1`           | `^5.0`  | `>= v20.6.0`       |
+
 ## Installation
 ```
 composer require lordsimal/cakephp-sentry
