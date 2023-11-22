@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace CakeSentry\Middleware;
 
 use Cake\Datasource\ConnectionManager;
+use Cake\Event\EventManager;
 use CakeSentry\Database\Log\CakeSentryLog;
+use CakeSentry\EventListener;
 use CakeSentry\QuerySpanTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -72,8 +74,13 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
         SentrySdk::getCurrentHub()->setSpan($span);
 
         $this->addQueryData();
+        $listener = new EventListener();
+        EventManager::instance()->on($listener);
 
         $response = $handler->handle($request);
+
+        $listener->addSpans();
+
         // We don't want to trace 404 responses as they are not relevant for performance monitoring.
         if ($response->getStatusCode() === 404) {
             $transaction->setSampled(false);
