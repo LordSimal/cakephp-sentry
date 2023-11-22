@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace CakeSentry;
 
 use Cake\Database\Log\LoggedQuery;
+use Cake\Database\Schema\MysqlSchemaDialect;
+use Cake\Datasource\ConnectionManager;
 use Sentry\SentrySdk;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
@@ -54,12 +56,13 @@ trait QuerySpanTrait
             return;
         }
 
+        $connection = ConnectionManager::get($connectionName);
+        $isMysql = $connection->getDriver()->schemaDialect() instanceof MysqlSchemaDialect;
+
         $spanContext = new SpanContext();
         $spanContext->setOp('db.sql.query');
         $spanContext->setData([
-            'db.connectionName' => $connectionName,
-            'db.role' => $context['role'],
-            'db.numRows' => $context['numRows'],
+            'db.system' => $isMysql ? 'mysql' : 'postgresql',
         ]);
         $spanContext->setDescription($context['query']);
         $spanContext->setStartTimestamp(microtime(true) - $context['took'] / 1000);
