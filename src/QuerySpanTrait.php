@@ -59,19 +59,21 @@ trait QuerySpanTrait
             return;
         }
 
-        $connection = ConnectionManager::get($connectionName);
-        $dialect = $connection->getDriver()->schemaDialect();
-        $type = match (true) {
-            $dialect instanceof MysqlSchemaDialect => 'mysql',
-            $dialect instanceof PostgresSchemaDialect => 'postgresql',
-            $dialect instanceof SqliteSchemaDialect => 'sqlite',
-            $dialect instanceof SqlserverSchemaDialect => 'mssql',
-        };
+        if ($connectionName) {
+            $connection = ConnectionManager::get($connectionName);
+            $dialect = $connection->getDriver()->schemaDialect();
+            $type = match (true) {
+                $dialect instanceof PostgresSchemaDialect => 'postgresql',
+                $dialect instanceof SqliteSchemaDialect => 'sqlite',
+                $dialect instanceof SqlserverSchemaDialect => 'mssql',
+                $dialect instanceof MysqlSchemaDialect, true => 'mysql',
+            };
+        }
 
         $spanContext = new SpanContext();
         $spanContext->setOp('db.sql.query');
         $spanContext->setData([
-            'db.system' => $type,
+            'db.system' => $type ?? 'mysql',
         ]);
         $spanContext->setDescription($context['query']);
         $spanContext->setStartTimestamp(microtime(true) - $context['took'] / 1000);
