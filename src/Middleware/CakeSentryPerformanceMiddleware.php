@@ -112,7 +112,7 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
             $logger = null;
             $driver = $connection->getDriver();
             $driverConfig = $driver->config();
-            if ($driverConfig['log']) {
+            if ($driverConfig['sentryLog']) {
                 $logger = $driver->getLogger();
                 if ($logger instanceof CakeSentryLog) {
                     $logger->setPerformanceMonitoring(true);

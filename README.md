@@ -233,7 +233,7 @@ to see SQL query execution and duration inside the performance monitoring sectio
 ```
 'Datasources' => [
     'default' => [
-        'log' => true
+        'sentryLog' => true
     ]
 ]
 ```
