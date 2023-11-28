@@ -3,13 +3,8 @@ declare(strict_types=1);
 
 namespace CakeSentry;
 
-use Cake\Database\Log\LoggedQuery;
-use Cake\Database\Schema\MysqlSchemaDialect;
-use Cake\Datasource\ConnectionManager;
 use Sentry\SentrySdk;
-use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
-use Sentry\Tracing\SpanStatus;
 
 trait EventSpanTrait
 {

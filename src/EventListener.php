@@ -64,7 +64,7 @@ class EventListener implements EventListenerInterface
                     DebugTimer::start('Cell.Action ' . get_class($cell) . '::' . $action);
                 }],
             ],
-            'Cell.afterAction' =>  [
+            'Cell.afterAction' => [
                 ['priority' => 0, 'callable' => function ($event, $cell, $action): void {
                     DebugTimer::stop('Cell.Action ' . get_class($cell) . '::' . $action);
                 }],
@@ -95,7 +95,7 @@ class EventListener implements EventListenerInterface
     public function addSpans(): void
     {
         foreach (DebugTimer::getAll() as $message => $event) {
-            $op = match(true) {
+            $op = match (true) {
                 str_starts_with($message, 'View:') => 'view.render',
                 str_starts_with($message, 'Event: View.') => 'view.render',
                 str_starts_with($message, 'Render File:') => 'view.render',
