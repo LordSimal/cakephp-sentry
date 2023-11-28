@@ -22,7 +22,7 @@ trait EventSpanTrait
             return;
         }
 
-        if ($startTime === 0) {
+        if ($startTime == 0) {
             $startTime = 1;
         }
 

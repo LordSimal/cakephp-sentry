@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace CakeSentry;
 
+use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
+use Cake\View\Cell;
 
 class EventListener implements EventListenerInterface
 {
@@ -16,17 +18,17 @@ class EventListener implements EventListenerInterface
      */
     public function implementedEvents(): array
     {
-        $before = function ($name) {
+        $before = function (string $name): callable {
             return function () use ($name): void {
                 DebugTimer::start($name);
             };
         };
-        $after = function ($name) {
+        $after = function (string $name): callable {
             return function () use ($name): void {
                 DebugTimer::stop($name);
             };
         };
-        $both = function ($name) use ($before, $after) {
+        $both = function (string $name) use ($before, $after): array {
             return [
                 ['priority' => 0, 'callable' => $before('Event: ' . $name)],
                 ['priority' => 999, 'callable' => $after('Event: ' . $name)],
@@ -60,22 +62,22 @@ class EventListener implements EventListenerInterface
             'View.beforeLayout' => $both('View.beforeLayout'),
             'View.afterLayout' => $both('View.afterLayout'),
             'Cell.beforeAction' => [
-                ['priority' => 0, 'callable' => function ($event, $cell, $action): void {
+                ['priority' => 0, 'callable' => function (EventInterface $event, Cell $cell, string $action): void {
                     DebugTimer::start('Cell.Action ' . get_class($cell) . '::' . $action);
                 }],
             ],
             'Cell.afterAction' => [
-                ['priority' => 0, 'callable' => function ($event, $cell, $action): void {
+                ['priority' => 0, 'callable' => function (EventInterface $event, Cell $cell, string $action): void {
                     DebugTimer::stop('Cell.Action ' . get_class($cell) . '::' . $action);
                 }],
             ],
             'View.beforeRenderFile' => [
-                ['priority' => 0, 'callable' => function ($event, $filename): void {
+                ['priority' => 0, 'callable' => function (EventInterface $event, string $filename): void {
                     DebugTimer::start('Render File: ' . $filename);
                 }],
             ],
             'View.afterRenderFile' => [
-                ['priority' => 0, 'callable' => function ($event, $filename): void {
+                ['priority' => 0, 'callable' => function (EventInterface $event, string $filename): void {
                     DebugTimer::stop('Render File: ' . $filename);
                 }],
             ],

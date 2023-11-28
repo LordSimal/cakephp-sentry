@@ -110,7 +110,9 @@ class DebugTimer
         if (!isset(self::$_timers[$name])) {
             return false;
         }
-        self::$_timers[$name]['end'] = $end;
+        if ($name) {
+            self::$_timers[$name]['end'] = $end;
+        }
 
         return true;
     }
