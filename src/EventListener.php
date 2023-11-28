@@ -59,6 +59,16 @@ class EventListener implements EventListenerInterface
             'View.afterRender' => $both('View.afterRender'),
             'View.beforeLayout' => $both('View.beforeLayout'),
             'View.afterLayout' => $both('View.afterLayout'),
+            'Cell.beforeAction' => [
+                ['priority' => 0, 'callable' => function ($event, $cell, $action): void {
+                    DebugTimer::start('Cell.Action ' . get_class($cell) . '::' . $action);
+                }],
+            ],
+            'Cell.afterAction' =>  [
+                ['priority' => 0, 'callable' => function ($event, $cell, $action): void {
+                    DebugTimer::stop('Cell.Action ' . get_class($cell) . '::' . $action);
+                }],
+            ],
             'View.beforeRenderFile' => [
                 ['priority' => 0, 'callable' => function ($event, $filename): void {
                     DebugTimer::start('Render File: ' . $filename);
