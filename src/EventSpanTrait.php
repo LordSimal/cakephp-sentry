@@ -23,7 +23,7 @@ trait EventSpanTrait
         }
 
         if ($startTime == 0) {
-            $startTime = 1;
+            $startTime = 0.00000000000001;
         }
 
         $spanContext = new SpanContext();
