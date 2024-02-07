@@ -53,7 +53,7 @@ jobs:
 
       - name: Code Coverage Report
         if: success() && matrix.php-version == '8.1'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
 
   cs-stan:
     name: Coding Standard & Static Analysis
