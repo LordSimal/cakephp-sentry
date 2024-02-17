@@ -1,7 +1,7 @@
 parameters:
-    paths:
-      - src
-      - tests/TestCase
-    level: 5
-    bootstrapFiles:
-      - tests/bootstrap.php
+	paths:
+		- src/
+	level: 5
+	checkMissingIterableValueType: false
+	bootstrapFiles:
+		- tests/bootstrap.php

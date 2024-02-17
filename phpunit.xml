@@ -10,14 +10,14 @@
 
     <testsuites>
         <testsuite name="cakephp">
-            <directory>./tests/TestCase/</directory>
+            <directory>tests/TestCase/</directory>
         </testsuite>
     </testsuites>
 
     <!-- Prevent coverage reports from looking in tests, vendors, config folders -->
     <source>
         <include>
-            <directory suffix=".php">./src/</directory>
+            <directory suffix=".php">src/</directory>
         </include>
     </source>
 </phpunit>
