@@ -19,8 +19,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "cs-check": "phpcs --colors -p src tests",
-        "cs-fix": "phpcbf --colors -p src tests",
+        "cs-check": "phpcs --colors -p src/ tests/",
+        "cs-fix": "phpcbf --colors -p src/ tests/",
         "phpstan": "tools/phpstan analyse",
         "psalm": "tools/psalm --show-info=false",
         "stan": [
