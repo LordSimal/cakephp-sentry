@@ -15,7 +15,7 @@ CakePHP integration for Sentry.
 - PHP 8.1+
 - CakePHP 5+
 - and a [Sentry](https://sentry.io) account
-  - if you use self hosted sentry make sure you are on at least version `>= v20.6.0` 
+  - if you use self-hosted sentry make sure you are on at least version `>= v20.6.0`
 
 ## Version table
 |     | PHP              | CakePHP | self-hosted Sentry |
@@ -82,7 +82,7 @@ You can filter out noisy exceptions which should not be debugged further.
 Also see [CakePHP Cookbook](https://book.cakephp.org/4/en/development/errors.html#error-exception-configuration)
 
 ### Set Options
-Everything inside the `'Sentry'` configuration key will be passed to `\Sentry\init()`.  
+Everything inside the `'Sentry'` configuration key will be passed to `\Sentry\init()`.
 Please check Sentry's official documentation on [about configuration](https://docs.sentry.io/error-reporting/configuration/?platform=php) and [about php-sdk's configuraion](https://docs.sentry.io/platforms/php/#php-specific-options).
 
 CakeSentry also provides custom event hooks to set dynamic values.
@@ -101,7 +101,7 @@ use Cake\Event\EventListenerInterface;
 
 class SentryOptionsContext implements EventListenerInterface
 {
-    public function implementedEvents(): array  
+    public function implementedEvents(): array
     {
         return [
             'CakeSentry.Client.afterSetup' => 'setServerContext',

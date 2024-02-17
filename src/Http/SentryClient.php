@@ -57,7 +57,9 @@ class SentryClient implements EventDispatcherInterface
             if ($connection->configName() === 'debug_kit') {
                 continue;
             }
-            $logger = $connection->getDriver()->getLogger();
+            /** @var \Cake\Database\Driver $driver */
+            $driver = $connection->getDriver();
+            $logger = $driver->getLogger();
 
             if ($logger instanceof CakeSentryLog) {
                 $logger->setIncludeSchema($includeSchemaReflection);
@@ -161,6 +163,7 @@ class SentryClient implements EventDispatcherInterface
 
         $client = $this->hub->getClient();
         if ($client) {
+            /** @var array<int, array{function?: string, line?: int, file?: string, class?: class-string, type?: string, args?: array}> $trace */
             $trace = $this->cleanedTrace($error->getTrace());
             /** @psalm-suppress ArgumentTypeCoercion */
             $stacktrace = $client->getStacktraceBuilder()

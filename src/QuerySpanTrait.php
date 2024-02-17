@@ -60,8 +60,9 @@ trait QuerySpanTrait
         }
 
         if ($connectionName) {
-            $connection = ConnectionManager::get($connectionName);
-            $dialect = $connection->getDriver()->schemaDialect();
+            /** @var \Cake\Database\Driver $driver */
+            $driver = ConnectionManager::get($connectionName)->getDriver();
+            $dialect = $driver->schemaDialect();
             $type = match (true) {
                 $dialect instanceof PostgresSchemaDialect => 'postgresql',
                 $dialect instanceof SqliteSchemaDialect => 'sqlite',
