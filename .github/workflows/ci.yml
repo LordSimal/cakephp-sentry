@@ -14,16 +14,16 @@ permissions:
 
 jobs:
   testsuite-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.1', '8.2' ]
+        php-version: [ '8.1', '8.2', '8.3' ]
         dependencies: ['highest']
         include:
           - php-version: '8.1'
             dependencies: 'lowest'
-          - php-version: '8.2'
+          - php-version: '8.3'
             dependencies: 'highest'
 
     steps:
