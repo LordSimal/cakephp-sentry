@@ -22,10 +22,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Sentry\Metrics\MetricsUnit;
 use Sentry\SentrySdk;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
+use function Sentry\metrics;
 use function Sentry\startTransaction;
 
 /**
@@ -84,6 +86,18 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
         // We don't want to trace 404 responses as they are not relevant for performance monitoring.
         if ($response->getStatusCode() === 404) {
             $transaction->setSampled(false);
+        } else {
+            $transaction
+                ->setHttpStatus($response->getStatusCode())
+                ->setData([
+                    'Memory Peak Usage (in bytes)' => memory_get_peak_usage(),
+                ]);
+
+            metrics()->distribution(
+                key: 'mem_peak_usage',
+                value: memory_get_peak_usage(),
+                unit: MetricsUnit::byte()
+            );
         }
 
         $span->setHttpStatus($response->getStatusCode());
