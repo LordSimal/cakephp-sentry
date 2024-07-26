@@ -15,6 +15,7 @@ namespace CakeSentry\Middleware;
 
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventManager;
+use Cake\Http\Server;
 use CakeSentry\Database\Log\CakeSentryLog;
 use CakeSentry\EventListener;
 use CakeSentry\QuerySpanTrait;
@@ -92,7 +93,15 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
         SentrySdk::getCurrentHub()->setSpan($transaction);
 
         $transaction->setHttpStatus($response->getStatusCode());
-        $transaction->finish();
+
+        if (function_exists('fastcgi_finish_request') && method_exists(Server::class, 'terminate')) {
+            // Send the transaction to sentry after the client has received the response
+            EventManager::instance()->on('Server.terminate', function () use ($transaction): void {
+                $transaction->finish();
+            });
+        } else {
+            $transaction->finish();
+        }
 
         return $response;
     }
