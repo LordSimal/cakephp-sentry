@@ -17,6 +17,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventManager;
 use Cake\Http\Server;
 use CakeSentry\Database\Log\CakeSentryLog;
+use CakeSentry\Event\HttpEventListener;
 use CakeSentry\EventListener;
 use CakeSentry\QuerySpanTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -77,6 +78,7 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
         $this->addQueryData();
         $listener = new EventListener();
         EventManager::instance()->on($listener);
+        EventManager::instance()->on(new HttpEventListener());
 
         $response = $handler->handle($request);
 
