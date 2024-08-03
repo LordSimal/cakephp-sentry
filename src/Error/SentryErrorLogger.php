@@ -10,14 +10,10 @@ use Cake\Error\PhpError;
 use Cake\Utility\Hash;
 use CakeSentry\Http\SentryClient;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerTrait;
-use Stringable;
 use Throwable;
 
 class SentryErrorLogger implements ErrorLoggerInterface
 {
-    use LoggerTrait;
-
     private ErrorLogger $logger;
 
     protected SentryClient $client;
@@ -60,13 +56,5 @@ class SentryErrorLogger implements ErrorLoggerInterface
         if (Hash::check($this->config, 'dsn')) {
             $this->client->captureError($error, $request);
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function log($level, Stringable|string $message, array $context = []): void
-    {
-        $this->logger->log($level, $message, $context);
     }
 }
