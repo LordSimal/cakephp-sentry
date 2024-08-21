@@ -1,20 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.14.1@b9d355e0829c397b9b3b47d0c0ed042a8a70284d">
+<files psalm-version="5.25.0@01a8eb06b9e9cc6cfb6a320bf9fb14331919d505">
   <file src="src/Database/Log/CakeSentryLog.php">
     <InternalMethod>
-      <code>getContext</code>
-      <code>getContext</code>
-      <code>jsonSerialize</code>
+      <code><![CDATA[getContext]]></code>
+      <code><![CDATA[getContext]]></code>
+      <code><![CDATA[jsonSerialize]]></code>
     </InternalMethod>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[!$querystring]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="src/DebugTimer.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[!$message]]></code>
+      <code><![CDATA[!$name]]></code>
+      <code><![CDATA[!$name]]></code>
+      <code><![CDATA[$name]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="src/EventSpanTrait.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$endTime]]></code>
+      <code><![CDATA[$startTime]]></code>
+    </RiskyTruthyFalsyComparison>
   </file>
   <file src="src/Http/SentryClient.php">
     <InternalMethod>
-      <code>getContext</code>
+      <code><![CDATA[getContext]]></code>
     </InternalMethod>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$extras]]></code>
+      <code><![CDATA[$extras]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="src/Middleware/CakeSentryPerformanceMiddleware.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$driverConfig['sentryLog'] ?? false]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="src/Middleware/CakeSentryQueryMiddleware.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$driverConfig['sentryLog'] ?? false]]></code>
+    </RiskyTruthyFalsyComparison>
   </file>
   <file src="src/QuerySpanTrait.php">
     <InternalMethod>
-      <code>getContext</code>
+      <code><![CDATA[getContext]]></code>
     </InternalMethod>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$connectionName]]></code>
+    </RiskyTruthyFalsyComparison>
   </file>
 </files>
