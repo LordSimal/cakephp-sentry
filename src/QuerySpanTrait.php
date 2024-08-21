@@ -10,21 +10,12 @@ use Cake\Database\Schema\SqliteSchemaDialect;
 use Cake\Database\Schema\SqlserverSchemaDialect;
 use Cake\Datasource\ConnectionManager;
 use Sentry\SentrySdk;
-use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
 
 trait QuerySpanTrait
 {
-    /**
-     * @var array
-     */
-    protected array $parentSpanStack = [];
-
-    /**
-     * @var array
-     */
-    protected array $currentSpanStack = [];
+    use SpanStackTrait;
 
     /**
      * @param \Cake\Database\Log\LoggedQuery $query
@@ -80,31 +71,5 @@ trait QuerySpanTrait
         $spanContext->setStartTimestamp(microtime(true) - $context['took'] / 1000);
         $spanContext->setEndTimestamp($spanContext->getStartTimestamp() + $context['took'] / 1000);
         $parentSpan->startChild($spanContext);
-    }
-
-    /**
-     * @param \Sentry\Tracing\Span $span The span.
-     * @return void
-     */
-    protected function pushSpan(Span $span): void
-    {
-        $this->parentSpanStack[] = SentrySdk::getCurrentHub()->getSpan();
-        SentrySdk::getCurrentHub()->setSpan($span);
-        $this->currentSpanStack[] = $span;
-    }
-
-    /**
-     * @return \Sentry\Tracing\Span|null
-     */
-    protected function popSpan(): ?Span
-    {
-        if (count($this->currentSpanStack) === 0) {
-            return null;
-        }
-
-        $parent = array_pop($this->parentSpanStack);
-        SentrySdk::getCurrentHub()->setSpan($parent);
-
-        return array_pop($this->currentSpanStack);
     }
 }
