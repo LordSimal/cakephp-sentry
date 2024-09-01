@@ -87,6 +87,9 @@ final class ClientTest extends TestCase
             $callback(SentryEvent::createEvent(), null),
             $actual(SentryEvent::createEvent(), null)
         );
+
+        restore_error_handler();
+        restore_exception_handler();
     }
 
     /**
