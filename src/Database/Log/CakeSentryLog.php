@@ -20,6 +20,7 @@ use CakeSentry\QuerySpanTrait;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Sentry\State\HubInterface;
+use Stringable;
 
 /**
  * CakeSentry Query logger (originated from DebugKit Query logged)
@@ -160,7 +161,7 @@ class CakeSentryLog extends AbstractLogger
     /**
      * @inheritDoc
      */
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         /** @var \Cake\Database\Log\LoggedQuery $query */
         $query = $context['query'];
