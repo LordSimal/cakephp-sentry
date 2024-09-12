@@ -10,7 +10,7 @@ use CakeSentry\Database\Log\CakeSentryLog;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LogLevel;
 
-final class CakeSentryLogTest extends TestCase
+class CakeSentryLogTest extends TestCase
 {
     protected CakeSentryLog $logger;
 

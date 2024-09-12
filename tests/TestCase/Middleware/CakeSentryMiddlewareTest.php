@@ -9,9 +9,10 @@ use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use CakeSentry\Database\Log\CakeSentryLog;
 use CakeSentry\Middleware\CakeSentryQueryMiddleware;
+use Mockery;
 use Psr\Http\Server\RequestHandlerInterface;
 
-final class CakeSentryMiddlewareTest extends TestCase
+class CakeSentryMiddlewareTest extends TestCase
 {
     public function testQueryLoggingEnabled(): void
     {
@@ -25,10 +26,10 @@ final class CakeSentryMiddlewareTest extends TestCase
             'body' => '<html><title>test</title><body><p>some text</p></body>',
         ]);
 
-        $handler = $this->handler();
-        $handler->expects($this->once())
-            ->method('handle')
-            ->willReturn($response);
+        $handler = Mockery::mock(RequestHandlerInterface::class);
+        $handler->shouldReceive('handle')
+            ->once()
+            ->andReturn($response);
 
         $middleware = new CakeSentryQueryMiddleware();
         $response = $middleware->process($request, $handler);
@@ -40,14 +41,5 @@ final class CakeSentryMiddlewareTest extends TestCase
             $driver = $connection->getDriver();
             $this->assertSame(CakeSentryLog::class, get_class($driver->getLogger()));
         }
-    }
-
-    protected function handler()
-    {
-        $handler = $this->getMockBuilder(RequestHandlerInterface::class)
-            ->onlyMethods(['handle'])
-            ->getMock();
-
-        return $handler;
     }
 }

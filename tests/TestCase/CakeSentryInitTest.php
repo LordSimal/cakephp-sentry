@@ -7,7 +7,7 @@ use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use CakeSentry\CakeSentryInit;
 
-final class CakeSentryInitTest extends TestCase
+class CakeSentryInitTest extends TestCase
 {
     /**
      * @inheritDoc
