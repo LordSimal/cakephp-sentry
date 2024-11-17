@@ -30,7 +30,7 @@ trait EventSpanTrait
         $spanContext->setDescription($name);
         $spanContext->setOp($sentryOp);
         //$spanContext->setData();
-        if ($startTime && $endTime) {
+        if ($startTime !== null && $endTime !== null) {
             $spanContext->setStartTimestamp(DebugTimer::requestStartTime() + $startTime);
             $spanContext->setEndTimestamp(DebugTimer::requestStartTime() + $endTime);
         }

@@ -31,17 +31,17 @@ class DebugTimer
     protected static array $_timers = [];
 
     /**
-     * Start an benchmarking timer.
+     * Start a benchmarking timer.
      *
-     * @param string $name The name of the timer to start.
-     * @param string $message A message for your timer
+     * @param string|null $name The name of the timer to start.
+     * @param string|null $message A message for your timer
      * @return bool Always true
      */
     public static function start(?string $name = null, ?string $message = null): bool
     {
         $start = microtime(true);
 
-        if (!$name) {
+        if ($name === null) {
             $named = false;
             $calledFrom = debug_backtrace();
             $file = $calledFrom[0]['file'] ?? 'unknown file';
@@ -51,7 +51,7 @@ class DebugTimer
             $named = true;
         }
 
-        if (!$message) {
+        if ($message === null) {
             $message = $name;
         }
 
@@ -80,13 +80,13 @@ class DebugTimer
      *
      * $name should be the same as the $name used in startTimer().
      *
-     * @param string $name The name of the timer to end.
+     * @param string|null $name The name of the timer to end.
      * @return bool true if timer was ended, false if timer was not started.
      */
     public static function stop(?string $name = null): bool
     {
         $end = microtime(true);
-        if (!$name) {
+        if ($name === null) {
             $names = array_reverse(array_keys(self::$_timers));
             foreach ($names as $name) {
                 if (!empty(self::$_timers[$name]['end'])) {
@@ -110,7 +110,7 @@ class DebugTimer
         if (!isset(self::$_timers[$name])) {
             return false;
         }
-        if ($name) {
+        if ($name !== null) {
             self::$_timers[$name]['end'] = $end;
         }
 

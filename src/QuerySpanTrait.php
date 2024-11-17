@@ -50,7 +50,7 @@ trait QuerySpanTrait
             return;
         }
 
-        if ($connectionName) {
+        if ($connectionName !== null) {
             /** @var \Cake\Database\Driver $driver */
             $driver = ConnectionManager::get($connectionName)->getDriver();
             $dialect = $driver->schemaDialect();
