@@ -39,7 +39,7 @@ class CakeSentryInit
         }
 
         $config = self::getConfig('sentry');
-        if ($config && Hash::check($config, 'dsn')) {
+        if ($config !== null && Hash::check($config, 'dsn')) {
             init($config);
             $event = new Event('CakeSentry.Client.afterSetup');
             EventManager::instance()->dispatch($event);

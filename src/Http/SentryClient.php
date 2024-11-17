@@ -121,7 +121,7 @@ class SentryClient implements EventDispatcherInterface
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('exception', 'request'));
         $eventManager->dispatch($event);
 
-        if ($extras) {
+        if ($extras !== null) {
             $this->hub->configureScope(function (Scope $scope) use ($extras): void {
                 $scope->setExtras($extras);
             });
@@ -152,7 +152,7 @@ class SentryClient implements EventDispatcherInterface
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('error', 'request'));
         $eventManager->dispatch($event);
 
-        if ($extras) {
+        if ($extras !== null) {
             $this->hub->configureScope(function (Scope $scope) use ($extras): void {
                 $scope->setExtras($extras);
             });
@@ -163,7 +163,7 @@ class SentryClient implements EventDispatcherInterface
 
         $client = $this->hub->getClient();
         if ($client) {
-            /** @var array<int, array{function?: string, line?: int, file?: string, class?: class-string, type?: string, args?: array}> $trace */
+            /** @var list<array{function?: string, line?: int, file?: string, class?: class-string, type?: string, args?: array}> $trace */
             $trace = $this->cleanedTrace($error->getTrace());
             /** @psalm-suppress ArgumentTypeCoercion */
             $stacktrace = $client->getStacktraceBuilder()
@@ -196,7 +196,7 @@ class SentryClient implements EventDispatcherInterface
      * @param array<array<string, null|int|string|array>> $traces
      * @return array<array<string, null|int|string|array>>
      */
-    private function cleanedTrace(array $traces): array
+    protected function cleanedTrace(array $traces): array
     {
         foreach ($traces as $key => $trace) {
             if (isset($trace['line']) && ($trace['line'] === '??' || $trace['line'] === '')) {
