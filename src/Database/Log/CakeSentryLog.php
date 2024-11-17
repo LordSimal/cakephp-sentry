@@ -196,8 +196,8 @@ class CakeSentryLog extends AbstractLogger
         $context = $query->getContext();
         $querystring = $context['query'] ?? '';
 
-        if (!$querystring) {
-            $querystring = $query->jsonSerialize()['query'];
+        if ($querystring === '') {
+            $querystring = $query->jsonSerialize()['query'] ?? '';
         }
 
         return // Multiple engines
