@@ -7,6 +7,7 @@ use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
 use Cake\Http\MiddlewareQueue;
 use CakeSentry\Middleware\CakeSentryMiddleware;
+use CakeSentry\Middleware\CakeSentryPerformanceMiddleware;
 
 class CakeSentryPlugin extends BasePlugin
 {
@@ -16,8 +17,14 @@ class CakeSentryPlugin extends BasePlugin
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
-        if (Configure::read('CakeSentry.enableQueryLogging', false)) {
+        $enableQueryLogging = Configure::read('CakeSentry.enableQueryLogging', false);
+        if ($enableQueryLogging) {
             $middlewareQueue = $middlewareQueue->add(new CakeSentryMiddleware());
+        }
+
+        $enablePerformanceLogging = Configure::read('CakeSentry.enablePerformanceMonitoring', false);
+        if ($enableQueryLogging && $enablePerformanceLogging) {
+            $middlewareQueue = $middlewareQueue->add(new CakeSentryPerformanceMiddleware());
         }
 
         return $middlewareQueue;
