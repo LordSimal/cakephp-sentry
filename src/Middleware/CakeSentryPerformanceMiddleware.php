@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace CakeSentry\Middleware;
 
+use Cake\Database\Driver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventManager;
 use Cake\Http\Server;
@@ -121,11 +122,13 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
             $logger = null;
             /** @var \Cake\Database\Driver $driver */
             $driver = $connection->getDriver();
-            $driverConfig = $driver->config();
-            if ($driverConfig['sentryLog'] ?? false) {
-                $logger = $driver->getLogger();
-                if ($logger instanceof CakeSentryLog) {
-                    $logger->setPerformanceMonitoring(true);
+            if ($driver instanceof Driver) {
+                $driverConfig = $driver->config();
+                if ($driverConfig['sentryLog'] ?? false) {
+                    $logger = $driver->getLogger();
+                    if ($logger instanceof CakeSentryLog) {
+                        $logger->setPerformanceMonitoring(true);
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace CakeSentry\Http;
 
 use Cake\Core\Configure;
+use Cake\Database\Driver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Error\PhpError;
 use Cake\Event\Event;
@@ -53,13 +54,17 @@ class SentryClient implements EventDispatcherInterface
         $includeSchemaReflection = (bool)Configure::read('CakeSentry.includeSchemaReflection');
 
         foreach ($configs as $name) {
+            $logger = null;
             $connection = ConnectionManager::get($name);
             if ($connection->configName() === 'debug_kit') {
                 continue;
             }
             /** @var \Cake\Database\Driver $driver */
             $driver = $connection->getDriver();
-            $logger = $driver->getLogger();
+
+            if ($driver instanceof Driver) {
+                $logger = $driver->getLogger();
+            }
 
             if ($logger instanceof CakeSentryLog) {
                 $logger->setIncludeSchema($includeSchemaReflection);
