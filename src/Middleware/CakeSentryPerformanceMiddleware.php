@@ -120,7 +120,7 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
                 continue;
             }
             $logger = null;
-            /** @var \Cake\Database\Driver $driver */
+            /** @var \Cake\Database\Driver|object $driver */
             $driver = $connection->getDriver();
             if ($driver instanceof Driver) {
                 $driverConfig = $driver->config();
