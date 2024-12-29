@@ -57,7 +57,7 @@ class SentryClient implements EventDispatcherInterface
             if ($connection->configName() === 'debug_kit') {
                 continue;
             }
-            /** @var \Cake\Database\Driver $driver */
+            /** @var \Cake\Database\Driver|object $driver */
             $driver = $connection->getDriver();
             $logger = $driver->getLogger();
 
