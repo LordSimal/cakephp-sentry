@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CakeSentry\Middleware;
 
 use Cake\Core\Configure;
+use Cake\Database\Driver;
 use Cake\Datasource\ConnectionManager;
 use CakeSentry\Database\Log\CakeSentryLog;
 use Psr\Http\Message\ResponseInterface;
@@ -59,9 +60,11 @@ class CakeSentryQueryMiddleware implements MiddlewareInterface
             $logger = null;
             /** @var \Cake\Database\Driver $driver */
             $driver = $connection->getDriver();
-            $driverConfig = $driver->config();
-            if ($driverConfig['sentryLog'] ?? false) {
-                $logger = $driver->getLogger();
+            if ($driver instanceof Driver) {
+                $driverConfig = $driver->config();
+                if ($driverConfig['sentryLog'] ?? false) {
+                    $logger = $driver->getLogger();
+                }
             }
 
             $logger = new CakeSentryLog($logger, $name, $includeSchemaReflection);
