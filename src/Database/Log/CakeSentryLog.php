@@ -163,6 +163,10 @@ class CakeSentryLog extends AbstractLogger
      */
     public function log($level, string|Stringable $message, array $context = []): void
     {
+        // Return early when elastic search provides no query
+        if (empty($context['query'])) {
+            return;
+        }
         /** @var \Cake\Database\Log\LoggedQuery $query */
         $query = $context['query'];
 
