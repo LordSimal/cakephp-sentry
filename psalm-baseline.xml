@@ -9,6 +9,14 @@
       <code><![CDATA[getContext]]></code>
       <code><![CDATA[jsonSerialize]]></code>
     </InternalMethod>
+    <PossiblyFalseArgument>
+      <code><![CDATA[$querystring]]></code>
+      <code><![CDATA[$querystring]]></code>
+      <code><![CDATA[$querystring]]></code>
+      <code><![CDATA[$querystring]]></code>
+      <code><![CDATA[$querystring]]></code>
+      <code><![CDATA[$querystring]]></code>
+    </PossiblyFalseArgument>
   </file>
   <file src="src/Http/SentryClient.php">
     <InternalMethod>

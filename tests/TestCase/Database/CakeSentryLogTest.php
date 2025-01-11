@@ -7,9 +7,10 @@ use Cake\Core\Configure;
 use Cake\Database\Log\LoggedQuery;
 use Cake\TestSuite\TestCase;
 use CakeSentry\Database\Log\CakeSentryLog;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LogLevel;
 
-final class CakeSentryLogTest extends TestCase
+class CakeSentryLogTest extends TestCase
 {
     protected CakeSentryLog $logger;
 
@@ -57,9 +58,9 @@ final class CakeSentryLogTest extends TestCase
     /**
      * Test log ignores schema reflection
      *
-     * @dataProvider schemaQueryProvider
      * @return void
      */
+    #[DataProvider('schemaQueryProvider')]
     public function testLogIgnoreReflection($sql)
     {
         $query = new LoggedQuery();
@@ -78,9 +79,9 @@ final class CakeSentryLogTest extends TestCase
     /**
      * Test config setting turns off schema ignores
      *
-     * @dataProvider schemaQueryProvider
      * @return void
      */
+    #[DataProvider('schemaQueryProvider')]
     public function testLogIgnoreReflectionDisabled($sql)
     {
         $query = new LoggedQuery();

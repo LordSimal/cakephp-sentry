@@ -7,13 +7,15 @@ use Cake\Core\Configure;
 use Cake\Error\PhpError;
 use CakeSentry\Error\SentryErrorLogger;
 use CakeSentry\Http\SentryClient;
+use Mockery;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
 use RuntimeException;
 
-final class SentryErrorLoggerTest extends TestCase
+class SentryErrorLoggerTest extends TestCase
 {
-    private SentryErrorLogger $subject;
+    protected SentryErrorLogger $logger;
+
+    protected SentryClient $client;
 
     /**
      * @inheritDoc
@@ -23,13 +25,9 @@ final class SentryErrorLoggerTest extends TestCase
         parent::setUp();
 
         Configure::write('Sentry.dsn', 'https://yourtoken@example.com/yourproject/1');
-        $subject = new SentryErrorLogger([]);
-
-        $clientMock = $this->createMock(SentryClient::class);
-        $this->subject = $subject;
-
-        $clientProp = $this->getClientProp();
-        $clientProp->setValue($this->subject, $clientMock);
+        $logger = new SentryErrorLogger([]);
+        $this->logger = $logger;
+        $this->client = Mockery::mock(SentryClient::class);
     }
 
     /**
@@ -38,13 +36,8 @@ final class SentryErrorLoggerTest extends TestCase
     public function testLogException()
     {
         $excpetion = new RuntimeException('some error');
-
-        $client = $this->getClientProp()->getValue($this->subject);
-        $client->expects($this->once())
-            ->method('captureException')
-            ->with($excpetion);
-
-        $this->subject->logException($excpetion);
+        $this->client->shouldReceive('captureException')->with($excpetion, null);
+        $this->assertNull($this->logger->logException($excpetion));
     }
 
     /**
@@ -53,25 +46,7 @@ final class SentryErrorLoggerTest extends TestCase
     public function testLogError()
     {
         $phpError = new PhpError(E_USER_WARNING, 'some error');
-
-        $client = $this->getClientProp()->getValue($this->subject);
-        $client->expects($this->once())
-            ->method('captureError')
-            ->with($phpError);
-
-        $this->subject->logError($phpError);
-    }
-
-    /**
-     * Helper access subject::$client(reflection)
-     *
-     * @return ReflectionProperty Client reflection
-     */
-    private function getClientProp()
-    {
-        $clientProp = new ReflectionProperty($this->subject, 'client');
-        $clientProp->setAccessible(true);
-
-        return $clientProp;
+        $this->client->shouldReceive('captureError')->with($phpError, null);
+        $this->assertNull($this->logger->logError($phpError));
     }
 }

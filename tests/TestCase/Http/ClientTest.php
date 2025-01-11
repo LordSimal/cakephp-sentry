@@ -11,6 +11,7 @@ use Cake\TestSuite\TestCase;
 use CakeSentry\CakeSentryInit;
 use CakeSentry\Http\SentryClient;
 use Exception;
+use Mockery;
 use RuntimeException;
 use Sentry\ClientBuilder;
 use Sentry\ClientInterface;
@@ -20,7 +21,7 @@ use Sentry\EventId;
 use Sentry\Options;
 use Sentry\State\Hub;
 
-final class ClientTest extends TestCase
+class ClientTest extends TestCase
 {
     /**
      * @inheritDoc
@@ -59,6 +60,7 @@ final class ClientTest extends TestCase
     {
         Configure::write('Sentry.server_name', 'test-server');
 
+        CakeSentryInit::init();
         $subject = new SentryClient();
         $options = $subject->getHub()->getClient()->getOptions();
 
@@ -87,6 +89,9 @@ final class ClientTest extends TestCase
             $callback(SentryEvent::createEvent(), null),
             $actual(SentryEvent::createEvent(), null)
         );
+
+        restore_error_handler();
+        restore_exception_handler();
     }
 
     /**
@@ -114,16 +119,13 @@ final class ClientTest extends TestCase
     public function testCaptureException(): void
     {
         $subject = new SentryClient();
-        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
-            'captureException' => null,
-        ]);
-        $subject->getHub()->bindClient($sentryClientP);
+        $client = Mockery::mock(ClientInterface::class);
+        $client->shouldReceive('captureException')->once()->andReturn(null);
+        $subject->getHub()->bindClient($client);
 
         $exception = new RuntimeException('something wrong.');
         $subject->captureException($exception);
-
-        $result = $sentryClientP->captureException($exception);
-        $this->assertSame(null, $result);
+        $this->assertTrue(true);
     }
 
     /**
@@ -224,10 +226,9 @@ final class ClientTest extends TestCase
     public function testCaptureDispatchBeforeExceptionCapture(): void
     {
         $subject = new SentryClient();
-        $sentryClientP = $this->createConfiguredMock(ClientInterface::class, [
-            'captureException' => null,
-        ]);
-        $subject->getHub()->bindClient($sentryClientP);
+        $client = Mockery::mock(ClientInterface::class);
+        $client->shouldReceive('captureException')->andReturn(null);
+        $subject->getHub()->bindClient($client);
 
         $called = false;
         EventManager::instance()->on(
