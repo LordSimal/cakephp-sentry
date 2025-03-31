@@ -36,7 +36,7 @@ class SentryErrorLogger implements ErrorLoggerInterface
     public function logException(
         Throwable $exception,
         ?ServerRequestInterface $request = null,
-        bool $includeTrace = false
+        bool $includeTrace = false,
     ): void {
         $this->logger->logException($exception, $request, $includeTrace);
         if (Hash::check($this->config, 'dsn')) {
@@ -50,7 +50,7 @@ class SentryErrorLogger implements ErrorLoggerInterface
     public function logError(
         PhpError $error,
         ?ServerRequestInterface $request = null,
-        bool $includeTrace = false
+        bool $includeTrace = false,
     ): void {
         $this->logger->logError($error, $request, $includeTrace);
         if (Hash::check($this->config, 'dsn')) {

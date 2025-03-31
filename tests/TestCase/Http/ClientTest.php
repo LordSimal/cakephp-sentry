@@ -93,7 +93,7 @@ class ClientTest extends TestCase
 
         $this->assertSame(
             $callback(SentryEvent::createEvent(), null),
-            $actual(SentryEvent::createEvent(), null)
+            $actual(SentryEvent::createEvent(), null),
         );
 
         restore_error_handler();
@@ -110,7 +110,7 @@ class ClientTest extends TestCase
             'CakeSentry.Client.afterSetup',
             function () use (&$called) {
                 $called = true;
-            }
+            },
         );
 
         CakeSentryInit::init();
@@ -241,7 +241,7 @@ class ClientTest extends TestCase
             'CakeSentry.Client.beforeCapture',
             function () use (&$called) {
                 $called = true;
-            }
+            },
         );
 
         $exception = new RuntimeException('Some error');
@@ -262,7 +262,7 @@ class ClientTest extends TestCase
             'CakeSentry.Client.beforeCapture',
             function () use (&$called) {
                 $called = true;
-            }
+            },
         );
 
         $phpError = new PhpError(E_USER_WARNING, 'Some error', '/my/app/path/test.php', 123);
@@ -284,7 +284,7 @@ class ClientTest extends TestCase
             function (Event $event) use (&$called, &$actualLastEventId) {
                 $called = true;
                 $actualLastEventId = $event->getData('lastEventId');
-            }
+            },
         );
 
         $phpError = new RuntimeException('Some error');
@@ -307,7 +307,7 @@ class ClientTest extends TestCase
             function (Event $event) use (&$called, &$actualLastEventId) {
                 $called = true;
                 $actualLastEventId = $event->getData('lastEventId');
-            }
+            },
         );
 
         $phpError = new PhpError(E_USER_WARNING, 'Some error', '/my/app/path/test.php', 123);

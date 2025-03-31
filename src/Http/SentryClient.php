@@ -101,8 +101,8 @@ class SentryClient implements EventDispatcherInterface
                             type: Breadcrumb::TYPE_DEFAULT,
                             category: 'sql.query',
                             message: $context['query'],
-                            metadata: $data
-                        )
+                            metadata: $data,
+                        ),
                     );
                 }
             }
@@ -120,7 +120,7 @@ class SentryClient implements EventDispatcherInterface
     public function captureException(
         Throwable $exception,
         ?ServerRequestInterface $request = null,
-        ?array $extras = null
+        ?array $extras = null,
     ): void {
         $eventManager = $this->getEventManager();
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('exception', 'request'));
@@ -151,7 +151,7 @@ class SentryClient implements EventDispatcherInterface
     public function captureError(
         PhpError $error,
         ?ServerRequestInterface $request = null,
-        ?array $extras = null
+        ?array $extras = null,
     ): void {
         $eventManager = $this->getEventManager();
         $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('error', 'request'));
@@ -181,7 +181,7 @@ class SentryClient implements EventDispatcherInterface
         $lastEventId = captureMessage(
             $error->getMessage(),
             Severity::fromError($error->getCode()),
-            $hint ?? null
+            $hint ?? null,
         );
         $event = new Event('CakeSentry.Client.afterCapture', $this, compact('error', 'request', 'lastEventId'));
         $eventManager->dispatch($event);
