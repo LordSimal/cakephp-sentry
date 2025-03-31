@@ -12,6 +12,7 @@ use CakeSentry\CakeSentryInit;
 use CakeSentry\Http\SentryClient;
 use Exception;
 use Mockery;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use RuntimeException;
 use Sentry\ClientBuilder;
 use Sentry\ClientInterface;
@@ -56,6 +57,7 @@ class ClientTest extends TestCase
     /**
      * Check constructor passes options to sentry client
      */
+    #[WithoutErrorHandler]
     public function testSetupClientSetOptions(): void
     {
         Configure::write('Sentry.server_name', 'test-server');
@@ -65,11 +67,15 @@ class ClientTest extends TestCase
         $options = $subject->getHub()->getClient()->getOptions();
 
         $this->assertSame('test-server', $options->getServerName());
+
+        restore_error_handler();
+        restore_exception_handler();
     }
 
     /**
      * Check constructor fill before_send option
      */
+    #[WithoutErrorHandler]
     public function testSetupClientSetSendCallback(): void
     {
         $callback = function (SentryEvent $event, ?EventHint $hint) {

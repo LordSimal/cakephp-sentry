@@ -24,7 +24,7 @@ jobs:
         include:
           - php-version: '8.1'
             dependencies: 'lowest'
-          - php-version: '8.3'
+          - php-version: '8.4'
             dependencies: 'highest'
 
     steps:
