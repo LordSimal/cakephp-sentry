@@ -60,7 +60,7 @@ bin/cake plugin load CakeSentry
 
 That's all! 🎉
 
-> [!CAUTION]
+> [!WARNING]
 > If events (error/exception) are not captured in Sentry try changing the order in which the plugins are loaded.
 
 ### Advanced Usage
