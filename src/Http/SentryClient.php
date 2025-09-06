@@ -170,7 +170,6 @@ class SentryClient implements EventDispatcherInterface
         if ($client) {
             /** @var list<array{function?: string, line?: int, file?: string, class?: class-string, type?: string, args?: array}> $trace */
             $trace = $this->cleanedTrace($error->getTrace());
-            /** @psalm-suppress ArgumentTypeCoercion */
             $stacktrace = $client->getStacktraceBuilder()
                 ->buildFromBacktrace($trace, $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
             $hint = EventHint::fromArray([

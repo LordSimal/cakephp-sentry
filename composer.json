@@ -28,13 +28,11 @@
         "cs-check": "phpcs --colors -p",
         "cs-fix": "phpcbf --colors -p",
         "phpstan": "tools/phpstan analyse",
-        "psalm": "tools/psalm --show-info=false",
         "stan": [
             "@phpstan",
             "@psalm"
         ],
         "stan-baseline": "tools/phpstan --generate-baseline",
-        "psalm-baseline": "tools/psalm --set-baseline=psalm-baseline.xml",
         "stan-setup": "phive install"
     },
     "config": {
