@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace CakeSentry\Log\Engines;
 
+use Cake\Event\EventManager;
+use Cake\Http\Server;
 use Cake\Log\Engine\BaseLog;
 use Psr\Log\LogLevel;
 use Sentry\Logs\Logs;
@@ -10,12 +12,22 @@ use Stringable;
 
 class SentryLog extends BaseLog
 {
+    public bool $logsWillBeFlushed = false;
+
     /**
      * @param array $config
      */
     public function __construct(array $config = [])
     {
         parent::__construct($config);
+
+        // Send the logs to sentry after the client has received the response
+        if (function_exists('fastcgi_finish_request') && method_exists(Server::class, 'terminate')) {
+            $this->logsWillBeFlushed = true;
+            EventManager::instance()->on('Server.terminate', function (): void {
+                Logs::getInstance()->flush();
+            });
+        }
     }
 
     /**
@@ -41,6 +53,8 @@ class SentryLog extends BaseLog
             default => $sentryLogger->trace($message, [], $context),
         };
 
-        $sentryLogger->flush();
+        if (!$this->logsWillBeFlushed) {
+            $sentryLogger->flush();
+        }
     }
 }

@@ -28,10 +28,7 @@
         "cs-check": "phpcs --colors -p",
         "cs-fix": "phpcbf --colors -p",
         "phpstan": "tools/phpstan analyse",
-        "stan": [
-            "@phpstan",
-            "@psalm"
-        ],
+        "stan": "@phpstan",
         "stan-baseline": "tools/phpstan --generate-baseline",
         "stan-setup": "phive install"
     },

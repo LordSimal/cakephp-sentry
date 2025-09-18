@@ -238,6 +238,36 @@ to see SQL query execution and duration inside the performance monitoring sectio
 ]
 ```
 
+### Sentry Logging (optional)
+
+> [!NOTE]
+> Only available, if you use Sentry SaaS or self-hosted Sentry version `>= v25.9.0`
+
+If you want to use the Logging Feature of sentry, you can use the following custom Sentry Logger class in your `config/app.php`:
+
+```php
+'Log' => [
+    // Other already existing log configs
+    'sentry' => [
+        'className' => \CakeSentry\Log\Engines\SentryLog::class,
+        'levels' => ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'],
+        'scopes' => [], // Listen for all scopes
+    ],
+]
+```
+
+or in your `config/bootstrap.php` via:
+
+```php
+\Cake\Log\Log::setConfig('CakeSentry', [
+    'className' => \CakeSentry\Log\Engines\SentryLog::class,
+    'levels' => ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'],
+    'scopes' => [], // Listen for all scopes
+]);
+```
+
+Adjust the `levels` and `scopes` to your needs.
+
 ## Upgrade from 2 to 3
 
 There are a few major changes from 2.0 to 3.0
