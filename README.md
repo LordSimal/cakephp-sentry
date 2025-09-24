@@ -268,6 +268,15 @@ or in your `config/bootstrap.php` via:
 
 Adjust the `levels` and `scopes` to your needs.
 
+Finally, you have to enable the `enable_logs` flag in the Sentry SDK as well via:
+
+```php
+'Sentry' => [
+    'dsn' => '<sentry-dsn-url>',
+    'enable_logs' => true,
+],
+```
+
 ## Upgrade from 2 to 3
 
 There are a few major changes from 2.0 to 3.0
