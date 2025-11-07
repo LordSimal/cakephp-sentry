@@ -110,9 +110,9 @@ class SentryOptionsContext implements EventListenerInterface
 
     public function setServerContext(Event $event): void
     {
-        /** @var \CakeSentry\Http\SentryClient $subject */
-        $subject = $event->getSubject();
-        $options = $subject->getHub()->getClient()->getOptions();
+        /** @var \Sentry\State\HubInterface $subject */
+        $hub = $event->getSubject();
+        $options = $subject->getClient()->getOptions();
 
         $options->setEnvironment('test_app');
         $options->setRelease('3.0.0@dev');
