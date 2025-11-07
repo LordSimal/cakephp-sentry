@@ -108,7 +108,8 @@ class ClientTest extends TestCase
         $called = false;
         EventManager::instance()->on(
             'CakeSentry.Client.afterSetup',
-            function () use (&$called) {
+            function (Event $event) use (&$called) {
+                $this->assertInstanceOf(Hub::class, $event->getSubject());
                 $called = true;
             },
         );

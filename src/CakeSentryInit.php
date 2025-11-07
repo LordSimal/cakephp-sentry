@@ -8,6 +8,7 @@ use Cake\Core\StaticConfigTrait;
 use Cake\Event\Event;
 use Cake\Event\EventManager;
 use Cake\Utility\Hash;
+use Sentry\SentrySdk;
 use function Sentry\init;
 
 class CakeSentryInit
@@ -41,7 +42,7 @@ class CakeSentryInit
         $config = self::getConfig('sentry');
         if ($config !== null && Hash::check($config, 'dsn')) {
             init($config);
-            $event = new Event('CakeSentry.Client.afterSetup');
+            $event = new Event('CakeSentry.Client.afterSetup', SentrySdk::getCurrentHub());
             EventManager::instance()->dispatch($event);
         }
     }
