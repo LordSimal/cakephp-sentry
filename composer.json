@@ -2,6 +2,16 @@
     "name": "lordsimal/cakephp-sentry",
     "description": "Sentry plugin for CakePHP",
     "type": "cakephp-plugin",
+    "keywords": [
+        "cakephp",
+        "plugin",
+        "sentry",
+        "error-tracking",
+        "monitoring",
+        "exception-handling",
+        "logging",
+        "error-logging"
+    ],
     "require": {
         "php": "^8.1",
         "cakephp/cakephp": "^5.1.0",
