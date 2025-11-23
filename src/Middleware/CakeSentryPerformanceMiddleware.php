@@ -18,6 +18,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventManager;
 use Cake\Http\Server;
 use CakeSentry\Database\Log\CakeSentryLog;
+use CakeSentry\Event\CacheEventListener;
 use CakeSentry\Event\HttpEventListener;
 use CakeSentry\EventListener;
 use CakeSentry\QuerySpanTrait;
@@ -80,6 +81,9 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
         $listener = new EventListener();
         EventManager::instance()->on($listener);
         EventManager::instance()->on(new HttpEventListener());
+        if (class_exists('\Cake\Cache\Event\CacheAfterAddEvent')) {
+            EventManager::instance()->on(new CacheEventListener());
+        }
 
         $response = $handler->handle($request);
 

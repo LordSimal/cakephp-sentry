@@ -33,25 +33,25 @@ class HttpEventListener implements EventListenerInterface
         /** @var \Cake\Http\Client\Request $request */
         $request = $event->getRequest();
         $parentSpan = SentrySdk::getCurrentHub()->getSpan();
-
-        if ($parentSpan !== null) {
-            $span = SpanContext::make()
-                ->setOp('http.client');
-
-            $uri = $request->getUri();
-            $fullUrl = sprintf('%s://%s%s/', $uri->getScheme(), $uri->getHost(), $uri->getPath());
-            $span
-                ->setDescription(sprintf('%s %s', $request->getMethod(), $fullUrl))
-                ->setData([
-                    'url' => $fullUrl,
-                    'http.query' => $uri->getQuery(),
-                    'http.fragment' => $uri->getFragment(),
-                    'http.request.method' => $request->getMethod(),
-                    'http.request.body.size' => $request->getBody()->getSize(),
-                ]);
-
-            $this->pushSpan($parentSpan->startChild($span));
+        if ($parentSpan === null) {
+            return;
         }
+        $span = SpanContext::make()
+            ->setOp('http.client');
+
+        $uri = $request->getUri();
+        $fullUrl = sprintf('%s://%s%s/', $uri->getScheme(), $uri->getHost(), $uri->getPath());
+        $span
+            ->setDescription(sprintf('%s %s', $request->getMethod(), $fullUrl))
+            ->setData([
+                'url' => $fullUrl,
+                'http.query' => $uri->getQuery(),
+                'http.fragment' => $uri->getFragment(),
+                'http.request.method' => $request->getMethod(),
+                'http.request.body.size' => $request->getBody()->getSize(),
+            ]);
+
+        $this->pushSpan($parentSpan->startChild($span));
     }
 
     /**
@@ -62,15 +62,16 @@ class HttpEventListener implements EventListenerInterface
     {
         $response = $event->getResult();
         $span = $this->popSpan();
-
-        if ($span !== null) {
-            $span
-                ->setHttpStatus($response?->getStatusCode() ?? 0)
-                ->setData([
-                    'http.response.body.size' => $response?->getBody()?->getSize(),
-                    'http.response.status_code' => $response?->getStatusCode() ?? 0,
-                ])
-                ->finish();
+        if ($span === null) {
+            return;
         }
+
+        $span
+            ->setHttpStatus($response?->getStatusCode() ?? 0)
+            ->setData([
+                'http.response.body.size' => $response?->getBody()?->getSize(),
+                'http.response.status_code' => $response?->getStatusCode() ?? 0,
+            ])
+            ->finish();
     }
 }
