@@ -5,7 +5,9 @@ namespace CakeSentry;
 
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
+use Cake\Event\EventManagerInterface;
 use Cake\Http\MiddlewareQueue;
+use CakeSentry\Event\QueueEventListener;
 use CakeSentry\Middleware\CakeSentryPerformanceMiddleware;
 use CakeSentry\Middleware\CakeSentryQueryMiddleware;
 
@@ -28,5 +30,14 @@ class CakeSentryPlugin extends BasePlugin
         }
 
         return $middlewareQueue;
+    }
+
+    /**
+     * @param \Cake\Event\EventManagerInterface $eventManager
+     * @return \Cake\Event\EventManagerInterface
+     */
+    public function events(EventManagerInterface $eventManager): EventManagerInterface
+    {
+        return $eventManager->on(new QueueEventListener());
     }
 }

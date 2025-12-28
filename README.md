@@ -277,6 +277,46 @@ Finally, you have to enable the `enable_logs` flag in the Sentry SDK as well via
 ],
 ```
 
+### Queue Integration (optional)
+
+To get queue insights working, your application and/or queue plugin needs to dispatch events according to the following structure:
+
+```php
+// When a job is being enqueued
+$this->dispatchEvent('CakeSentry.Queue.enqueue', [
+    'class' => '\App\Job\ExampleJob', // optional, but recommended
+    'id' => 'unique-job-id', // optional, but recommended
+    'queue' => 'some-queue-name', // optional, defaults to 'default'
+    'data' => ['some' => 'data'], // optional, defaults to []
+]);
+
+// When a job starts processing
+$this->dispatchEvent('CakeSentry.Queue.beforeExecute', [
+    'class' => '\App\Job\ExampleJob', // optional, but recommended
+    'sentry_trace' => '<sentry-trace-header-value>', // optional
+    'sentry_baggage' => '<sentry-baggage-header-value>', // optional
+]);
+
+// When a job has been processed successfully
+$this->dispatchEvent('CakeSentry.Queue.afterExecute', [
+    'id' => 'unique-job-id', // optional, but recommended
+    'queue' => 'some-queue-name', // optional, defaults to 'default'
+    'data' => ['some' => 'data'], // optional, defaults to []
+    'execution_time' => 123, // optional, in milliseconds
+    'retry_count' => 0, // optional
+]);
+
+// When a job has failed during processing
+$this->dispatchEvent('CakeSentry.Queue.afterExecute', [
+    'id' => 'unique-job-id', // optional, but recommended
+    'queue' => 'some-queue-name', // optional, defaults to 'default'
+    'data' => ['some' => 'data'], // optional, defaults to []
+    'execution_time' => 123, // optional, in milliseconds
+    'retry_count' => 0, // optional
+    'exception' => $exception, // required, the exception that was thrown
+]);
+```
+
 ## Upgrade from 2 to 3
 
 There are a few major changes from 2.0 to 3.0
