@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": "^8.1",
-        "cakephp/cakephp": "^5.1.0",
+        "cakephp/cakephp": "^5.3",
         "sentry/sentry": "^4.15"
     },
     "require-dev": {
