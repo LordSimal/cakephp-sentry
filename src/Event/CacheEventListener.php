@@ -9,6 +9,7 @@ use Cake\Cache\Event\CacheAfterGetEvent;
 use Cake\Cache\Event\CacheAfterIncrementEvent;
 use Cake\Cache\Event\CacheAfterSetEvent;
 use Cake\Cache\Event\CacheClearedEvent;
+use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use Cake\I18n\DateTime;
 use DateInterval;
@@ -33,21 +34,27 @@ class CacheEventListener implements EventListenerInterface
     }
 
     /**
-     * @param \Cake\Cache\Event\CacheAfterGetEvent $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
-    public function onCacheAfterGet(CacheAfterGetEvent $event): void
+    public function onCacheAfterGet(EventInterface $event): void
     {
+        if (!$event instanceof CacheAfterGetEvent) {
+            return;
+        }
         $value = $this->serializedEventValue($event->getValue());
         $this->addGetSpan($event->getKey(), $value);
     }
 
     /**
-     * @param \Cake\Cache\Event\CacheAfterSetEvent $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
-    public function onCacheAfterSet(CacheAfterSetEvent $event): void
+    public function onCacheAfterSet(EventInterface $event): void
     {
+        if (!$event instanceof CacheAfterSetEvent) {
+            return;
+        }
         $ttl = $event->getTtl();
         if ($ttl instanceof DateInterval) {
             $now = new DateTime();
@@ -59,11 +66,14 @@ class CacheEventListener implements EventListenerInterface
     }
 
     /**
-     * @param \Cake\Cache\Event\CacheAfterAddEvent $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
-    public function onCacheAfterAdd(CacheAfterAddEvent $event): void
+    public function onCacheAfterAdd(EventInterface $event): void
     {
+        if (!$event instanceof CacheAfterAddEvent) {
+            return;
+        }
         $ttl = $event->getTtl();
         if ($ttl instanceof DateInterval) {
             $now = new DateTime();
@@ -75,30 +85,39 @@ class CacheEventListener implements EventListenerInterface
     }
 
     /**
-     * @param \Cake\Cache\Event\CacheAfterIncrementEvent $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
-    public function onCacheAfterIncrement(CacheAfterIncrementEvent $event): void
+    public function onCacheAfterIncrement(EventInterface $event): void
     {
+        if (!$event instanceof CacheAfterIncrementEvent) {
+            return;
+        }
         $value = $this->serializedEventValue($event->getValue());
         $this->addPutSpan($event->getKey(), $value);
     }
 
     /**
-     * @param \Cake\Cache\Event\CacheAfterDeleteEvent $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
-    public function onCacheAfterDelete(CacheAfterDeleteEvent $event): void
+    public function onCacheAfterDelete(EventInterface $event): void
     {
+        if (!$event instanceof CacheAfterDeleteEvent) {
+            return;
+        }
         $this->addRemoveSpan($event->getKey());
     }
 
     /**
-     * @param \Cake\Cache\Event\CacheClearedEvent $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
-    public function onCacheCleared(CacheClearedEvent $event): void
+    public function onCacheCleared(EventInterface $event): void
     {
+        if (!$event instanceof CacheClearedEvent) {
+            return;
+        }
         $this->addClearSpan();
     }
 
