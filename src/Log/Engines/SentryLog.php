@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace CakeSentry\Log\Engines;
 
 use Cake\Event\EventManager;
-use Cake\Http\Server;
 use Cake\Log\Engine\BaseLog;
 use Psr\Log\LogLevel;
 use Sentry\Logs\Logs;
@@ -22,11 +21,7 @@ class SentryLog extends BaseLog
         parent::__construct($config);
 
         // Send the logs to sentry after the client has received the response
-        if (
-            PHP_SAPI !== 'cli' &&
-            function_exists('fastcgi_finish_request') &&
-            method_exists(Server::class, 'terminate')
-        ) {
+        if (PHP_SAPI !== 'cli' && function_exists('fastcgi_finish_request')) {
             $this->logsWillBeFlushed = true;
             EventManager::instance()->on('Server.terminate', function (): void {
                 Logs::getInstance()->flush();

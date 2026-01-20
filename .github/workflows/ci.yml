@@ -22,7 +22,7 @@ jobs:
         php-version: [ '8.2', '8.3', '8.4', '8.5' ]
         dependencies: ['highest']
         include:
-          - php-version: '8.1'
+          - php-version: '8.2'
             dependencies: 'lowest'
 
     steps:
@@ -51,7 +51,7 @@ jobs:
           fi
 
       - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.1'
+        if: success() && matrix.php-version == '8.2'
         uses: codecov/codecov-action@v5
 
   cs-stan:

@@ -16,7 +16,6 @@ namespace CakeSentry\Middleware;
 use Cake\Database\Driver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventManager;
-use Cake\Http\Server;
 use CakeSentry\Database\Log\CakeSentryLog;
 use CakeSentry\Event\CacheEventListener;
 use CakeSentry\Event\HttpEventListener;
@@ -101,7 +100,7 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
 
         $transaction->setHttpStatus($response->getStatusCode());
 
-        if (function_exists('fastcgi_finish_request') && method_exists(Server::class, 'terminate')) {
+        if (function_exists('fastcgi_finish_request')) {
             // Send the transaction to sentry after the client has received the response
             EventManager::instance()->on('Server.terminate', function () use ($transaction): void {
                 $transaction->finish();
