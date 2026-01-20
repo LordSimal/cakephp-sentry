@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace CakeSentry\Log\Engines;
 
 use Cake\Event\EventManager;
-use Cake\Http\Server;
 use Cake\Log\Engine\BaseLog;
 use Psr\Log\LogLevel;
 use Sentry\Logs\Logs;

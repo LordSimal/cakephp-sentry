@@ -16,7 +16,6 @@ namespace CakeSentry\Middleware;
 use Cake\Database\Driver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventManager;
-use Cake\Http\Server;
 use CakeSentry\Database\Log\CakeSentryLog;
 use CakeSentry\Event\CacheEventListener;
 use CakeSentry\Event\HttpEventListener;
