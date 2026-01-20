@@ -22,11 +22,7 @@ class SentryLog extends BaseLog
         parent::__construct($config);
 
         // Send the logs to sentry after the client has received the response
-        if (
-            PHP_SAPI !== 'cli' &&
-            function_exists('fastcgi_finish_request') &&
-            method_exists(Server::class, 'terminate')
-        ) {
+        if (PHP_SAPI !== 'cli' && function_exists('fastcgi_finish_request')) {
             $this->logsWillBeFlushed = true;
             EventManager::instance()->on('Server.terminate', function (): void {
                 Logs::getInstance()->flush();
