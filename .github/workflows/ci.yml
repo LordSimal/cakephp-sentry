@@ -64,7 +64,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, intl
           coverage: none
           tools: phive, cs2pr
@@ -73,7 +73,7 @@ jobs:
         uses: ramsey/composer-install@v3
 
       - name: Install PHP tools with phive.
-        run: "phive install --trust-gpg-keys 'CF1A108D0E7AE720,51C67305FFC2E5C0,12CE0F1D262429A5'"
+        run: "phive install --trust-gpg-keys 'CF1A108D0E7AE720,51C67305FFC2E5C0,99BF4D9A33D65E1E'"
 
       - name: Run phpcs
         if: always()
