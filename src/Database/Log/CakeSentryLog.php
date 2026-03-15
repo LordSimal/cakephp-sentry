@@ -198,7 +198,7 @@ class CakeSentryLog extends AbstractLogger
     protected function isSchemaQuery(LoggedQuery $query): bool
     {
         $context = $query->getContext();
-        $querystring = $context['query'] ?? false;
+        $querystring = $context['query'] ?? '';
 
         if ($querystring === '') {
             $querystring = $query->jsonSerialize()['query'] ?? '';

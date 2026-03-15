@@ -107,7 +107,7 @@ class DebugTimer
                 $name = $_name . ' #' . $i;
             }
         }
-        if (!isset(self::$_timers[$name])) {
+        if ($name && !isset(self::$_timers[$name])) {
             return false;
         }
         if ($name !== null) {
