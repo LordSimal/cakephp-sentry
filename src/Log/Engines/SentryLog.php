@@ -35,6 +35,7 @@ class SentryLog extends BaseLog
      * @param array $context
      * @return void
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
     public function log($level, string|Stringable $message, array $context = []): void
     {
