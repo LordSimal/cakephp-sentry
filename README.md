@@ -11,7 +11,7 @@ CakePHP integration for Sentry.
 
 ## Documentation
 
-See https://losimal.github.io/cakephp-sentry/
+See https://lordsimal.github.io/cakephp-sentry/
 
 ## License
 The plugin is available as open source under the terms of the [MIT License](https://github.com/lordsimal/cakephp-sentry/blob/master/LICENSE).
