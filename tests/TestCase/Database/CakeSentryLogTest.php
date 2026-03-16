@@ -98,6 +98,39 @@ class CakeSentryLogTest extends TestCase
         $this->assertCount(1, $logger->queries());
     }
 
+    public function testLogIgnoresMissingQueryContext(): void
+    {
+        $this->logger->log(LogLevel::DEBUG, 'SELECT 1');
+
+        $this->assertCount(0, $this->logger->queries());
+        $this->assertSame(0.0, $this->logger->totalTime());
+        $this->assertSame(0.0, $this->logger->totalRows());
+        $this->assertSame('write', $this->logger->role());
+    }
+
+    public function testLogUsesSerializedQueryForEmptyContextQuery(): void
+    {
+        $query = new class () extends LoggedQuery {
+            public function jsonSerialize(): array
+            {
+                return ['query' => 'SHOW INDEXES FROM articles'];
+            }
+        };
+        $query->setContext([
+            'query' => '',
+            'took' => 10,
+            'numRows' => 5,
+            'role' => 'read',
+        ]);
+
+        $this->logger->log(LogLevel::DEBUG, 'SHOW INDEXES FROM articles', ['query' => $query]);
+
+        $this->assertCount(0, $this->logger->queries());
+        $this->assertSame(0.0, $this->logger->totalTime());
+        $this->assertSame(0.0, $this->logger->totalRows());
+        $this->assertSame('write', $this->logger->role());
+    }
+
     public static function schemaQueryProvider()
     {
         return [
