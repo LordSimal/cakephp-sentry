@@ -53,6 +53,10 @@ jobs:
       - name: Code Coverage Report
         if: success() && matrix.php-version == '8.2'
         uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: LordSimal/cakephp-sentry
+
 
   cs-stan:
     name: Coding Standard & Static Analysis
