@@ -15,7 +15,7 @@ return [
     'Log' => [
         // Other already existing log configs
         'sentry' => [
-            'className' => \CakeSentry\Log\Engines\SentryLog::class,
+            'className' => \CakeSentry\Log\Engines\CakeSentryLog::class,
             'levels' => ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'],
             'scopes' => [], // Listen for all scopes
         ],
@@ -25,7 +25,7 @@ return [
 
 ```php [ config/bootstrap.php]
 \Cake\Log\Log::setConfig('CakeSentry', [
-    'className' => \CakeSentry\Log\Engines\SentryLog::class,
+    'className' => \CakeSentry\Log\Engines\CakeSentryLog::class,
     'levels' => ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'],
     'scopes' => [], // Listen for all scopes
 ]);
