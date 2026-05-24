@@ -37,14 +37,13 @@
         "test": "phpunit",
         "cs-check": "phpcs --colors -p",
         "cs-fix": "phpcbf --colors -p",
-        "phpstan": "tools/phpstan analyse",
+        "phpstan": "bin/docker-exec ghcr.io/phpstan/phpstan:2-php8.4 analyse",
         "stan": [
-            "tools/phpstan analyse",
-            "tools/psalm"
+            "bin/docker-exec ghcr.io/phpstan/phpstan:2-php8.4 analyse",
+            "bin/docker-exec ghcr.io/danog/psalm:7.0.0-beta19 /composer/vendor/bin/psalm --no-cache"
         ],
-        "stan-baseline": "tools/phpstan --generate-baseline",
-        "psalm-baseline": "tools/psalm --set-baseline=psalm-baseline.xml",
-        "stan-setup": "phive install"
+        "stan-baseline": "bin/docker-exec ghcr.io/phpstan/phpstan:2-php8.4 --generate-baseline",
+        "psalm-baseline": "bin/docker-exec ghcr.io/danog/psalm:7.0.0-beta19 /composer/vendor/bin/psalm --no-cache --set-baseline=psalm-baseline.xml"
     },
     "config": {
         "sort-packages": true,

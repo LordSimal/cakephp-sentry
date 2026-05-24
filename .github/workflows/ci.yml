@@ -71,13 +71,10 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, intl
           coverage: none
-          tools: phive, cs2pr
+          tools: cs2pr
 
       - name: Composer install
         uses: ramsey/composer-install@v4
-
-      - name: Install PHP tools with phive.
-        run: "phive install --trust-gpg-keys 'CF1A108D0E7AE720,51C67305FFC2E5C0,99BF4D9A33D65E1E,12CE0F1D262429A5'"
 
       - name: Run phpcs
         if: always()
@@ -85,8 +82,12 @@ jobs:
 
       - name: Run phpstan
         if: always()
-        run: tools/phpstan analyse --error-format=github
+        uses: docker://ghcr.io/phpstan/phpstan:2-php8.4
+        with:
+          args: analyse --error-format=github
 
       - name: Run Psalm
         if: always()
-        run: tools/psalm --output-format=github
+        uses: docker://ghcr.io/danog/psalm:7.0.0-beta19
+        with:
+          args: /composer/vendor/bin/psalm --no-cache --output-format=github
