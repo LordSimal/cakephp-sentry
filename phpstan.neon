@@ -9,3 +9,5 @@ parameters:
 			identifier: missingType.iterableValue
 		-
 			identifier: missingType.generics
+includes:
+	- phpstan-baseline.neon
