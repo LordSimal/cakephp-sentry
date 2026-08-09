@@ -11,12 +11,12 @@
 return [
     'CakeSentry' => [
         'enableQueryLogging' => true,
-        'enablePerformanceMonitoring' => true
-    ]
+        'enablePerformanceMonitoring' => true,
+    ],
     'Sentry' => [
         'dsn' => '<sentry-dsn-url>',
         'traces_sample_rate' => 1,
-    ]
+    ],
 ];
 ```
 
@@ -34,6 +34,7 @@ return [
             // ...
         ],
     ],
+];
 ```     
 
 :::
