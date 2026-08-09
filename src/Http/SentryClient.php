@@ -22,12 +22,8 @@ use Throwable;
 use function Sentry\captureException;
 use function Sentry\captureMessage;
 
-/**
- * @implements \Cake\Event\EventDispatcherInterface<\CakeSentry\Http\SentryClient>
- */
 class SentryClient implements EventDispatcherInterface
 {
-    /** @use \Cake\Event\EventDispatcherTrait<\CakeSentry\Http\SentryClient> */
     use EventDispatcherTrait;
 
     protected HubInterface $hub;
