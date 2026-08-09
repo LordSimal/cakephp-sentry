@@ -123,22 +123,24 @@ class SentryClient implements EventDispatcherInterface
         ?ServerRequestInterface $request = null,
         ?array $extras = null,
     ): void {
-        $eventManager = $this->getEventManager();
-        $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('exception', 'request'));
-        $eventManager->dispatch($event);
+        $this->hub->withScope(function () use ($exception, $request, $extras): void {
+            $eventManager = $this->getEventManager();
+            $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('exception', 'request'));
+            $eventManager->dispatch($event);
 
-        if ($extras !== null) {
-            $this->hub->configureScope(function (Scope $scope) use ($extras): void {
-                $scope->setExtras($extras);
-            });
-        }
+            if ($extras !== null) {
+                $this->hub->configureScope(function (Scope $scope) use ($extras): void {
+                    $scope->setExtras($extras);
+                });
+            }
 
-        $this->getQueryLoggers();
-        $this->addQueryBreadcrumbs();
+            $this->getQueryLoggers();
+            $this->addQueryBreadcrumbs();
 
-        $lastEventId = captureException($exception);
-        $event = new Event('CakeSentry.Client.afterCapture', $this, compact('exception', 'request', 'lastEventId'));
-        $eventManager->dispatch($event);
+            $lastEventId = captureException($exception);
+            $event = new Event('CakeSentry.Client.afterCapture', $this, compact('exception', 'request', 'lastEventId'));
+            $eventManager->dispatch($event);
+        });
     }
 
     /**
@@ -154,37 +156,39 @@ class SentryClient implements EventDispatcherInterface
         ?ServerRequestInterface $request = null,
         ?array $extras = null,
     ): void {
-        $eventManager = $this->getEventManager();
-        $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('error', 'request'));
-        $eventManager->dispatch($event);
+        $this->hub->withScope(function () use ($error, $request, $extras): void {
+            $eventManager = $this->getEventManager();
+            $event = new Event('CakeSentry.Client.beforeCapture', $this, compact('error', 'request'));
+            $eventManager->dispatch($event);
 
-        if ($extras !== null) {
-            $this->hub->configureScope(function (Scope $scope) use ($extras): void {
-                $scope->setExtras($extras);
-            });
-        }
+            if ($extras !== null) {
+                $this->hub->configureScope(function (Scope $scope) use ($extras): void {
+                    $scope->setExtras($extras);
+                });
+            }
 
-        $this->getQueryLoggers();
-        $this->addQueryBreadcrumbs();
+            $this->getQueryLoggers();
+            $this->addQueryBreadcrumbs();
 
-        $client = $this->hub->getClient();
-        if ($client) {
-            /** @var list<array{function?: string, line?: int, file?: string, class?: class-string, type?: string, args?: array}> $trace */
-            $trace = $this->cleanedTrace($error->getTrace());
-            $stacktrace = $client->getStacktraceBuilder()
-                ->buildFromBacktrace($trace, $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
-            $hint = EventHint::fromArray([
-                'stacktrace' => $stacktrace,
-            ]);
-        }
+            $client = $this->hub->getClient();
+            if ($client) {
+                /** @var list<array{function?: string, line?: int, file?: string, class?: class-string, type?: string, args?: array}> $trace */
+                $trace = $this->cleanedTrace($error->getTrace());
+                $stacktrace = $client->getStacktraceBuilder()
+                    ->buildFromBacktrace($trace, $error->getFile() ?? 'unknown file', $error->getLine() ?? 0);
+                $hint = EventHint::fromArray([
+                    'stacktrace' => $stacktrace,
+                ]);
+            }
 
-        $lastEventId = captureMessage(
-            $error->getMessage(),
-            Severity::fromError($error->getCode()),
-            $hint ?? null,
-        );
-        $event = new Event('CakeSentry.Client.afterCapture', $this, compact('error', 'request', 'lastEventId'));
-        $eventManager->dispatch($event);
+            $lastEventId = captureMessage(
+                $error->getMessage(),
+                Severity::fromError($error->getCode()),
+                $hint ?? null,
+            );
+            $event = new Event('CakeSentry.Client.afterCapture', $this, compact('error', 'request', 'lastEventId'));
+            $eventManager->dispatch($event);
+        });
     }
 
     /**
