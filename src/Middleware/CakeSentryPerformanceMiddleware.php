@@ -28,8 +28,10 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Sentry\SentrySdk;
 use Sentry\Tracing\SpanContext;
+use Sentry\Tracing\SpanStatus;
 use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
+use Throwable;
 use function Sentry\startTransaction;
 
 /**
@@ -116,6 +118,16 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
             }
 
             return $response;
+        } catch (Throwable $exception) {
+            $span
+                ->setStatus(SpanStatus::internalError())
+                ->finish();
+            SentrySdk::getCurrentHub()->setSpan($transaction);
+            $transaction
+                ->setStatus(SpanStatus::internalError())
+                ->finish();
+
+            throw $exception;
         } finally {
             $eventManager->off($listener);
             $eventManager->off($httpListener);
