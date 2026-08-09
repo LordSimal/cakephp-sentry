@@ -19,6 +19,7 @@ use Cake\Event\EventManager;
 use CakeSentry\Database\Log\CakeSentryLog;
 use CakeSentry\Event\CacheEventListener;
 use CakeSentry\Event\HttpEventListener;
+use CakeSentry\DebugTimer;
 use CakeSentry\EventListener;
 use CakeSentry\QuerySpanTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -79,15 +80,44 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
         SentrySdk::getCurrentHub()->setSpan($span);
 
         $this->addQueryData();
+        $eventManager = EventManager::instance();
         $listener = new EventListener();
-        EventManager::instance()->on($listener);
-        EventManager::instance()->on(new HttpEventListener());
+        $httpListener = new HttpEventListener();
+        $eventManager->on($listener);
+        $eventManager->on($httpListener);
+        $cacheListener = null;
         if (class_exists('\Cake\Cache\Event\CacheAfterAddEvent')) {
-            EventManager::instance()->on(new CacheEventListener());
+            $cacheListener = new CacheEventListener();
+            $eventManager->on($cacheListener);
         }
 
         try {
             $response = $handler->handle($request);
+
+            $listener->addSpans();
+
+            // We don't want to trace 404 responses as they are not relevant for performance monitoring.
+            if ($response->getStatusCode() === 404) {
+                $transaction->setSampled(false);
+            }
+
+            $span->setHttpStatus($response->getStatusCode());
+            $span->finish();
+
+            SentrySdk::getCurrentHub()->setSpan($transaction);
+
+            $transaction->setHttpStatus($response->getStatusCode());
+
+            if (function_exists('fastcgi_finish_request')) {
+                // Send the transaction to sentry after the client has received the response
+                EventManager::instance()->on('Server.terminate', function () use ($transaction): void {
+                    $transaction->finish();
+                });
+            } else {
+                $transaction->finish();
+            }
+
+            return $response;
         } catch (Throwable $exception) {
             $span
                 ->setStatus(SpanStatus::internalError())
@@ -98,32 +128,14 @@ class CakeSentryPerformanceMiddleware implements MiddlewareInterface
                 ->finish();
 
             throw $exception;
+        } finally {
+            $eventManager->off($listener);
+            $eventManager->off($httpListener);
+            if ($cacheListener !== null) {
+                $eventManager->off($cacheListener);
+            }
+            DebugTimer::clear();
         }
-
-        $listener->addSpans();
-
-        // We don't want to trace 404 responses as they are not relevant for performance monitoring.
-        if ($response->getStatusCode() === 404) {
-            $transaction->setSampled(false);
-        }
-
-        $span->setHttpStatus($response->getStatusCode());
-        $span->finish();
-
-        SentrySdk::getCurrentHub()->setSpan($transaction);
-
-        $transaction->setHttpStatus($response->getStatusCode());
-
-        if (function_exists('fastcgi_finish_request')) {
-            // Send the transaction to sentry after the client has received the response
-            EventManager::instance()->on('Server.terminate', function () use ($transaction): void {
-                $transaction->finish();
-            });
-        } else {
-            $transaction->finish();
-        }
-
-        return $response;
     }
 
     /**

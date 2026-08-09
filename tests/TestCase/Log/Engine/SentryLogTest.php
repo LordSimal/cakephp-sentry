@@ -76,7 +76,7 @@ class SentryLogTest extends TestCase
     {
         return [
             'warning' => [LogLevel::WARNING, LogLevel::WARNING, true],
-            'error' => [LogLevel::ERROR, LogLevel::ERROR, false],
+            'error' => [LogLevel::ERROR, LogLevel::ERROR, true],
             'notice' => [LogLevel::NOTICE, LogLevel::INFO, true],
             'debug' => [LogLevel::DEBUG, LogLevel::DEBUG, true],
             'emergency' => [LogLevel::EMERGENCY, LogLevel::CRITICAL, true],
