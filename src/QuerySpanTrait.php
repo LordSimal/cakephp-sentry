@@ -39,12 +39,14 @@ trait QuerySpanTrait
             return;
         }
 
-        if ($context['query'] === 'COMMIT') {
+        if (in_array($context['query'], ['COMMIT', 'ROLLBACK'], true)) {
             $span = $this->popSpan();
 
             if ($span !== null) {
                 $span->finish();
-                $span->setStatus(SpanStatus::ok());
+                if ($context['query'] === 'COMMIT') {
+                    $span->setStatus(SpanStatus::ok());
+                }
             }
 
             return;
