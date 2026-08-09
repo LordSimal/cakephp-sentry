@@ -46,7 +46,7 @@ class SentryLog extends BaseLog
 
         match ($level) {
             LogLevel::EMERGENCY, LogLevel::ALERT, LogLevel::CRITICAL => $sentryLogger->fatal($message, [], $context),
-            LogLevel::ERROR => $sentryLogger->error($message),
+            LogLevel::ERROR => $sentryLogger->error($message, [], $context),
             LogLevel::WARNING => $sentryLogger->warn($message, [], $context),
             LogLevel::NOTICE, LogLevel::INFO => $sentryLogger->info($message, [], $context),
             LogLevel::DEBUG => $sentryLogger->debug($message, [], $context),
