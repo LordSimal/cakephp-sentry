@@ -50,6 +50,7 @@ class SentryClient implements EventDispatcherInterface
      */
     protected function getQueryLoggers(): void
     {
+        $this->_loggers = [];
         $configs = ConnectionManager::configured();
         $includeSchemaReflection = (bool)Configure::read('CakeSentry.includeSchemaReflection');
 
