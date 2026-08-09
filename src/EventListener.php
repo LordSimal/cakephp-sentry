@@ -12,12 +12,21 @@ class EventListener implements EventListenerInterface
     use EventSpanTrait;
 
     /**
+     * @var array<string, mixed>|null
+     */
+    private ?array $events = null;
+
+    /**
      * Return an array of events to listen to.
      *
      * @return array<string, mixed>
      */
     public function implementedEvents(): array
     {
+        if ($this->events !== null) {
+            return $this->events;
+        }
+
         $before = function (string $name): callable {
             return function () use ($name): void {
                 DebugTimer::start($name);
@@ -35,7 +44,7 @@ class EventListener implements EventListenerInterface
             ];
         };
 
-        return [
+        return $this->events = [
             'Controller.initialize' => [
                 ['priority' => 0, 'callable' => $before('Event: Controller.initialize')],
                 ['priority' => 999, 'callable' => $after('Event: Controller.initialize')],
