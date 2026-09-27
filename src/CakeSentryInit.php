@@ -18,7 +18,7 @@ class CakeSentryInit
     /**
      * @var array|array<array>
      */
-    protected static array $_defaultConfig = [
+    protected static array $defaultConfig = [
         'sentry' => [
             'prefixes' => [
                 APP,
@@ -36,7 +36,7 @@ class CakeSentryInit
     {
         $userConfig = Configure::read('Sentry');
         if ($userConfig) {
-            self::$_config['sentry'] = array_merge(self::$_defaultConfig['sentry'], $userConfig);
+            self::$config['sentry'] = array_merge(self::$defaultConfig['sentry'], $userConfig);
         }
 
         $config = self::getConfig('sentry');

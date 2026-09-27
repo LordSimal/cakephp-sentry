@@ -3,7 +3,7 @@
 ## General Setup
 
 > [!WARNING]
-> This is only available if you are on CakePHP 5 and Version 3+ of this plugin
+> This is available on CakePHP 5+ with Version 3+ of this plugin.
 
 ::: code-group
 

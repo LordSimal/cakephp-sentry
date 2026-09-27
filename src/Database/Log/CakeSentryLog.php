@@ -101,7 +101,7 @@ class CakeSentryLog extends AbstractLogger
      * @param bool $value Set
      * @return $this
      */
-    public function setIncludeSchema(bool $value)
+    public function setIncludeSchema(bool $value): static
     {
         $this->includeSchema = $value;
 

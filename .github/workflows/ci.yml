@@ -5,6 +5,7 @@ on:
     branches:
       - '3.x'
       - '3.next'
+      - '4.x'
   pull_request:
     branches:
       - '*'
@@ -19,10 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.2', '8.3', '8.4', '8.5' ]
+        php-version: [ '8.4', '8.5' ]
         dependencies: ['highest']
         include:
-          - php-version: '8.2'
+          - php-version: '8.4'
             dependencies: 'lowest'
 
     steps:
@@ -44,14 +45,14 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          if [[ ${{ matrix.php-version }} == '8.2' ]]; then
+          if [[ ${{ matrix.php-version }} == '8.4' ]]; then
             vendor/bin/phpunit --coverage-clover=coverage.xml
           else
             vendor/bin/phpunit
           fi
 
       - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.2'
+        if: success() && matrix.php-version == '8.4'
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

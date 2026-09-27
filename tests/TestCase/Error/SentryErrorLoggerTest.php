@@ -4,14 +4,17 @@ declare(strict_types=1);
 namespace CakeSentry\Test\TestCase\Error;
 
 use Cake\Core\Configure;
+use Cake\Error\ErrorLogger;
 use Cake\Error\PhpError;
 use CakeSentry\Error\SentryErrorLogger;
 use CakeSentry\Http\SentryClient;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use ReflectionProperty;
 use RuntimeException;
+use Stringable;
 
 class SentryErrorLoggerTest extends TestCase
 {
@@ -80,6 +83,44 @@ class SentryErrorLoggerTest extends TestCase
 
         $logger->logError(new PhpError(E_USER_WARNING, 'some error'));
         $this->assertTrue(true);
+    }
+
+    public function testPsrLogMethodsDelegateToCakeErrorLogger(): void
+    {
+        $cakeLogger = Mockery::mock(ErrorLogger::class);
+        $this->setProperty($this->logger, 'logger', $cakeLogger);
+        $context = ['userId' => 42];
+
+        $levels = [
+            LogLevel::EMERGENCY,
+            LogLevel::ALERT,
+            LogLevel::CRITICAL,
+            LogLevel::ERROR,
+            LogLevel::WARNING,
+            LogLevel::NOTICE,
+            LogLevel::INFO,
+            LogLevel::DEBUG,
+        ];
+        foreach ($levels as $level) {
+            $cakeLogger->shouldReceive('log')->once()->with($level, 'Message', $context);
+            $this->logger->{$level}('Message', $context);
+        }
+    }
+
+    public function testLogDelegatesStringableMessageAndContext(): void
+    {
+        $cakeLogger = Mockery::mock(ErrorLogger::class);
+        $this->setProperty($this->logger, 'logger', $cakeLogger);
+        $message = new class implements Stringable {
+            public function __toString(): string
+            {
+                return 'Message';
+            }
+        };
+        $context = ['userId' => 42];
+        $cakeLogger->shouldReceive('log')->once()->with(LogLevel::ERROR, $message, $context);
+
+        $this->logger->log(LogLevel::ERROR, $message, $context);
     }
 
     private function setProperty(object $subject, string $property, mixed $value): void

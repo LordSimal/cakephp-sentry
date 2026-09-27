@@ -1,7 +1,7 @@
 # Queue Integration
 
 > [!WARNING]
-> This is only available if you are on **CakePHP 5** and **Version 3.5+** of this plugin
+> This is available on **CakePHP 5+** with **Version 3.5+** of this plugin.
 
 To get queue insights working, your application and/or queue plugin needs to dispatch events according to the following structure:
 

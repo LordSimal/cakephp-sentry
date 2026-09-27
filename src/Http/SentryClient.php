@@ -31,7 +31,7 @@ class SentryClient implements EventDispatcherInterface
     /**
      * Loggers connected
      */
-    protected array $_loggers = [];
+    protected array $loggers = [];
 
     /**
      * Initialize the hub for this client
@@ -46,7 +46,7 @@ class SentryClient implements EventDispatcherInterface
      */
     protected function getQueryLoggers(): void
     {
-        $this->_loggers = [];
+        $this->loggers = [];
         $configs = ConnectionManager::configured();
         $includeSchemaReflection = (bool)Configure::read('CakeSentry.includeSchemaReflection');
 
@@ -65,7 +65,7 @@ class SentryClient implements EventDispatcherInterface
 
             if ($logger instanceof CakeSentryLog) {
                 $logger->setIncludeSchema($includeSchemaReflection);
-                $this->_loggers[] = $logger;
+                $this->loggers[] = $logger;
             }
         }
     }
@@ -77,8 +77,8 @@ class SentryClient implements EventDispatcherInterface
      */
     protected function addQueryBreadcrumbs(): void
     {
-        if ($this->_loggers) {
-            foreach ($this->_loggers as $logger) {
+        if ($this->loggers) {
+            foreach ($this->loggers as $logger) {
                 /** @var array<\Cake\Database\Log\LoggedQuery> $queries */
                 $queries = $logger->queries();
                 if (empty($queries)) {

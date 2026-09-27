@@ -28,7 +28,7 @@ class DebugTimer
      *
      * @var array
      */
-    protected static array $_timers = [];
+    protected static array $timers = [];
 
     /**
      * Start a benchmarking timer.
@@ -57,7 +57,7 @@ class DebugTimer
 
         $_name = $name;
         $i = 1;
-        while (isset(self::$_timers[$name])) {
+        while (isset(self::$timers[$name])) {
             $i++;
             $name = $_name . ' #' . $i;
         }
@@ -66,7 +66,7 @@ class DebugTimer
             $message .= ' #' . $i;
         }
 
-        self::$_timers[$name] = [
+        self::$timers[$name] = [
             'start' => $start,
             'message' => $message,
             'named' => $named,
@@ -87,31 +87,31 @@ class DebugTimer
     {
         $end = microtime(true);
         if ($name === null) {
-            $names = array_reverse(array_keys(self::$_timers));
+            $names = array_reverse(array_keys(self::$timers));
             foreach ($names as $name) {
-                if (!empty(self::$_timers[$name]['end'])) {
+                if (!empty(self::$timers[$name]['end'])) {
                     continue;
                 }
-                if (empty(self::$_timers[$name]['named'])) {
+                if (empty(self::$timers[$name]['named'])) {
                     break;
                 }
             }
         } else {
             $i = 1;
             $_name = $name;
-            while (isset(self::$_timers[$name])) {
-                if (empty(self::$_timers[$name]['end'])) {
+            while (isset(self::$timers[$name])) {
+                if (empty(self::$timers[$name]['end'])) {
                     break;
                 }
                 $i++;
                 $name = $_name . ' #' . $i;
             }
         }
-        if ($name && !isset(self::$_timers[$name])) {
+        if ($name && !isset(self::$timers[$name])) {
             return false;
         }
         if ($name !== null) {
-            self::$_timers[$name]['end'] = $end;
+            self::$timers[$name]['end'] = $end;
         }
 
         return true;
@@ -130,8 +130,8 @@ class DebugTimer
         $now = microtime(true);
 
         $times = [];
-        if (!empty(self::$_timers)) {
-            $firstTimer = reset(self::$_timers);
+        if (!empty(self::$timers)) {
+            $firstTimer = reset(self::$timers);
             $_end = $firstTimer['start'];
         } else {
             $_end = $now;
@@ -143,7 +143,7 @@ class DebugTimer
             'time' => round($_end - $start, 6),
             'named' => null,
         ];
-        foreach (self::$_timers as $name => $timer) {
+        foreach (self::$timers as $name => $timer) {
             if (!isset($timer['end'])) {
                 $timer['end'] = $now;
             }
@@ -154,7 +154,7 @@ class DebugTimer
             ]);
         }
         if ($clear) {
-            self::$_timers = [];
+            self::$timers = [];
         }
 
         return $times;
@@ -167,7 +167,7 @@ class DebugTimer
      */
     public static function clear(): bool
     {
-        self::$_timers = [];
+        self::$timers = [];
 
         return true;
     }
@@ -181,11 +181,11 @@ class DebugTimer
      */
     public static function elapsedTime(string $name = 'default', int $precision = 5): float
     {
-        if (!isset(self::$_timers[$name]['start']) || !isset(self::$_timers[$name]['end'])) {
+        if (!isset(self::$timers[$name]['start']) || !isset(self::$timers[$name]['end'])) {
             return 0;
         }
 
-        return round(self::$_timers[$name]['end'] - self::$_timers[$name]['start'], $precision);
+        return round(self::$timers[$name]['end'] - self::$timers[$name]['start'], $precision);
     }
 
     /**

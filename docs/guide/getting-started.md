@@ -4,8 +4,8 @@ CakeSentry integrates [Sentry](https://sentry.io) with CakePHP applications.
 
 ## Requirements
 
-- PHP 7.4+ or PHP 8.0+
-- CakePHP 4.4+ or CakePHP 5.0+
+- PHP 8.4+ for the current development branch
+- CakePHP 6.0.x-dev for the current development branch
 - A Sentry account on [sentry.io](https://sentry.io) or a self-hosted Sentry instance
 
 ## Plugin Compatibility
@@ -15,6 +15,7 @@ CakeSentry integrates [Sentry](https://sentry.io) with CakePHP applications.
 | `1.x`   | `^7.4` or `^8.0` | `^4.4`  | 🤷🏻               |
 | `2.x`   | `^8.1`           | `^5.0`  | 🤷🏻               |
 | `3.x`   | `^8.1`           | `^5.0`  | `>= v20.6.0`       |
+| Development branch | `^8.4` | `6.0.x-dev` | — |
 
 ## Install
 
@@ -44,7 +45,7 @@ return [
 ::: code-group
 
 ```php [src/Application.php]
-public function bootstrap()
+public function bootstrap(): void
 {
     parent::bootstrap();
 
