@@ -4,9 +4,11 @@ CakeSentry integrates [Sentry](https://sentry.io) with CakePHP applications.
 
 ## Requirements
 
-- PHP 7.4+ or PHP 8.0+
-- CakePHP 4.4+ or CakePHP 5.0+
+- PHP 8.2+ (including PHP 8.6)
+- CakePHP 5.3+
 - A Sentry account on [sentry.io](https://sentry.io) or a self-hosted Sentry instance
+
+The current release is tested in CI on PHP 8.2 through 8.6.
 
 ## Plugin Compatibility
 
